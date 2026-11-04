@@ -1,0 +1,2092 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TaoMate 精读:锚点引导的记忆,如何让数字人 1000 秒不漂移</title>
+<meta name="description" content="TaoMate (arXiv 2607.24359) 深度解读:持久记忆的数学、置信门控、因果蒸馏与阶段并行推理。">
+<script>
+MathJax = {
+  tex: { inlineMath: [['\\(','\\)']], displayMath: [['$$','$$']] },
+  svg: { fontCache: 'local' },
+  options: { skipHtmlTags: ['script','noscript','style','textarea','pre','code'] }
+};
+</script>
+<script src="assets/mathjax/tex-svg.js" id="MathJax-script" async></script>
+<style>
+:root{
+  --lav-50:#faf7ff;--lav-100:#f3e8ff;--lav-200:#e9d5ff;--lav-300:#d8b4fe;--lav-400:#c084fc;--lav-500:#a855f7;--lav-600:#9333ea;--lav-700:#6d28d9;
+  --coral-100:#ffe4e6;--coral-200:#fecdd3;--coral-400:#fb7185;--coral-500:#f43f5e;--coral-700:#be123c;
+  --mint-100:#d1fae5;--mint-200:#a7f3d0;--mint-400:#34d399;--mint-500:#10b981;--mint-700:#047857;
+  --amber-100:#fef3c7;--amber-200:#fde68a;--amber-500:#f59e0b;--amber-700:#b45309;
+  --blue-100:#dbeafe;--blue-500:#3b82f6;--blue-700:#1d4ed8;
+  --ink:#1a1730;--ink-soft:#403d57;--ink-muted:#76738c;--line:#e9e4f5;
+  --paper:#fff;--paper-warm:#fbf9ff;
+  --sidebar:296px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:78px}
+body{font-family:"Noto Sans SC","PingFang SC","Microsoft YaHei",-apple-system,sans-serif;color:var(--ink);background:var(--paper);line-height:1.9;font-size:16.5px;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+h1,h2,h3,h4{font-family:"Noto Serif SC","Songti SC","SimSun",serif;line-height:1.38;font-weight:800}
+p{margin:14px 0;color:var(--ink-soft)}
+b,strong{color:var(--ink);font-weight:700}
+em{font-style:normal;background:linear-gradient(transparent 60%,#fde68a 60%);padding:0 2px}
+a{color:var(--lav-700)}
+ul,ol{margin:12px 0 12px 24px;color:var(--ink-soft)}
+li{margin:7px 0}
+code{font-family:"JetBrains Mono",Consolas,monospace;font-size:.86em;background:#f4f0ff;color:#6d28d9;padding:2px 6px;border-radius:5px;border:1px solid #ece5fb}
+/* progress + sidebar */
+#progress{position:fixed;top:0;left:0;height:3px;width:0;background:linear-gradient(90deg,#a855f7,#fb7185,#fbbf24);z-index:200;transition:width .08s}
+#sidebar{position:fixed;top:0;left:0;bottom:0;width:var(--sidebar);background:linear-gradient(180deg,#fdfbff,#faf6ff);border-right:1px solid var(--line);padding:26px 16px 30px;overflow-y:auto;z-index:120}
+#sidebar .sbrand{font-family:"Noto Serif SC",serif;font-weight:900;font-size:17px;color:var(--lav-700);line-height:1.35;margin-bottom:3px}
+#sidebar .ssub{font-size:10.5px;color:var(--ink-muted);letter-spacing:1.2px;margin-bottom:16px}
+#sidebar ol{list-style:none;margin:0;padding:0}
+#sidebar li{margin:0}
+#sidebar a{display:block;font-size:12.8px;color:var(--ink-soft);text-decoration:none;padding:6px 9px 6px 30px;border-radius:8px;position:relative;line-height:1.45;transition:.15s}
+#sidebar a::before{content:attr(data-n);position:absolute;left:8px;top:6px;font-family:Consolas,monospace;font-size:10px;color:#b8b0d6}
+#sidebar a:hover{background:#f3e8ff;color:var(--lav-700)}
+#sidebar a.active{background:linear-gradient(90deg,#f3e8ff,#fdf4ff);color:var(--lav-700);font-weight:700;box-shadow:inset 3px 0 0 var(--lav-500)}
+#sidebar .sgrp{font-size:10.5px;letter-spacing:2px;color:#a49bc6;margin:16px 0 5px 10px;font-weight:700}
+#tocToggle{display:none}
+main{margin-left:var(--sidebar);padding:0 0 90px}
+.wrap{max-width:880px;margin:0 auto;padding:0 36px}
+@media(max-width:1080px){
+  #sidebar{transform:translateX(-100%);transition:.25s;box-shadow:0 0 40px rgba(30,20,60,.12)}
+  #sidebar.open{transform:none}
+  main{margin-left:0}
+  #tocToggle{display:flex;position:fixed;top:14px;right:14px;z-index:130;background:#fff;border:1px solid var(--line);border-radius:12px;padding:9px 14px;font-size:13px;font-weight:700;color:var(--lav-700);box-shadow:0 6px 20px rgba(80,50,150,.14);cursor:pointer;align-items:center;gap:6px;font-family:inherit}
+  .wrap{padding:0 18px}
+}
+/* hero */
+.hero{padding:92px 0 56px;border-bottom:1px solid var(--line);background:
+  radial-gradient(ellipse 620px 340px at 10% 8%,rgba(192,132,252,.14),transparent 62%),
+  radial-gradient(ellipse 540px 320px at 90% 62%,rgba(251,191,36,.12),transparent 62%),
+  linear-gradient(180deg,#fdfbff,#fff)}
+.hero .eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:700;letter-spacing:2.6px;color:var(--lav-600);background:#f3e8ff;border:1px solid #e2d4fb;padding:6px 16px;border-radius:100px;margin-bottom:20px}
+.hero h1{font-size:clamp(1.95rem,4.5vw,3.2rem);font-weight:900;letter-spacing:-.02em;background:linear-gradient(120deg,#1a1730 0%,#6d28d9 44%,#be123c 74%,#b45309 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:16px}
+.hero .lede{font-size:17px;color:var(--ink-soft);max-width:740px}
+.hero .meta{display:flex;gap:20px;flex-wrap:wrap;margin-top:22px;font-size:12.5px;color:var(--ink-muted)}
+.hero .meta span{display:flex;align-items:center;gap:6px}
+.hero .dot{width:6px;height:6px;border-radius:50%;background:var(--lav-400)}
+.heroart{margin:30px auto 0;max-width:860px}
+.heroart svg{width:100%;height:auto;border-radius:22px;border:1px solid rgba(168,85,247,.13);box-shadow:0 26px 72px -30px rgba(30,20,70,.22);background:#fff}
+.herocap{font-size:11.5px;color:var(--ink-muted);margin-top:10px;font-style:italic;text-align:center}
+/* section */
+section{padding:54px 0 12px;border-bottom:1px solid var(--line)}
+section:last-of-type{border-bottom:none}
+.chhead{display:flex;align-items:flex-start;gap:16px;margin-bottom:6px}
+.chnum{flex:0 0 auto;font-family:Consolas,monospace;font-size:12px;font-weight:700;color:#fff;background:linear-gradient(135deg,#a855f7,#7e22ce);padding:7px 11px;border-radius:10px;margin-top:9px}
+section h2{font-size:clamp(1.45rem,2.9vw,1.98rem);font-weight:900;letter-spacing:-.01em}
+.sub{font-size:13.5px;color:var(--ink-muted);margin-top:5px}
+section h3{font-size:1.15rem;font-weight:800;margin:36px 0 10px;color:var(--lav-700);display:flex;align-items:center;gap:9px}
+section h3::before{content:'';width:4px;height:17px;border-radius:2px;background:linear-gradient(180deg,#a855f7,#fb7185);flex:0 0 auto}
+section h4{font-size:1rem;margin:22px 0 6px}
+.lead{font-size:17px;color:var(--ink);border-left:3px solid var(--lav-300);padding-left:16px;margin:18px 0}
+/* boxes */
+.box{border-radius:16px;padding:20px 22px;margin:24px 0;font-size:15.2px}
+.box p:first-child{margin-top:0}.box p:last-child{margin-bottom:0}
+.box .btag{display:inline-block;font-size:11px;font-weight:700;letter-spacing:1.3px;padding:3px 11px;border-radius:8px;margin-bottom:10px}
+.insight{background:linear-gradient(135deg,#ecfdf5,#d1fae5);border:1px solid #a7f3d0}
+.insight .btag{background:var(--mint-500);color:#fff}
+.insight h4{color:#065f46;margin-top:0}
+.insight p{color:#065f46}
+.warn{background:linear-gradient(135deg,#fff1f2,#ffe4e6);border:1px solid #fecdd3}
+.warn .btag{background:var(--coral-500);color:#fff}
+.warn h4{color:#881337;margin-top:0}
+.warn p{color:#9f1239}
+.note{background:linear-gradient(135deg,#fffbeb,#fef3c7);border:1px solid #fde68a}
+.note .btag{background:var(--amber-500);color:#fff}
+.note h4{color:#78350f;margin-top:0}
+.note p{color:#78350f}
+.def{background:linear-gradient(135deg,#eff6ff,#dbeafe);border:1px solid #bfdbfe}
+.def .btag{background:var(--blue-500);color:#fff}
+.def h4{color:#1e3a8a;margin-top:0}
+.def p{color:#1e3a8a}
+/* derivation */
+.deriv{background:var(--paper-warm);border:1px solid var(--line);border-radius:16px;padding:6px 22px 16px;margin:24px 0}
+.deriv .dtitle{display:inline-block;background:#fff;border:1px solid var(--line);border-radius:9px;padding:4px 12px;font-size:11.5px;font-weight:700;letter-spacing:.8px;color:var(--lav-700);margin:16px 0 2px}
+.step{display:flex;gap:13px;margin:15px 0;align-items:flex-start}
+.step .sn{flex:0 0 auto;width:23px;height:23px;border-radius:50%;background:#f3e8ff;color:var(--lav-700);font-family:Consolas,monospace;font-size:11.5px;font-weight:700;display:flex;align-items:center;justify-content:center;margin-top:5px}
+.step .sc{flex:1;min-width:0}
+.step .why{font-size:13.6px;color:var(--ink-muted);margin-top:6px;border-left:2px solid #e9d5ff;padding-left:10px}
+.eq{position:relative;margin:16px 0;padding:2px 0;overflow-x:auto;overflow-y:hidden;max-width:100%}
+.eq mjx-container{max-width:100%}
+/* table */
+.tw{overflow-x:auto;margin:20px 0;max-width:100%;width:100%}
+table{width:100%;border-collapse:collapse;font-size:14.1px;min-width:0;table-layout:fixed}
+th{background:#f6f1ff;color:var(--lav-700);font-weight:700;text-align:left;padding:10px 11px;border-bottom:2px solid #e9d5ff;font-size:13.2px}
+td{padding:9px 11px;border-bottom:1px solid #f0ebfa;color:var(--ink-soft);vertical-align:top;word-break:break-word}
+tr:hover td{background:#fcfaff}
+td b{color:var(--ink)}
+caption{caption-side:bottom;font-size:12.5px;color:var(--ink-muted);text-align:left;padding-top:8px;line-height:1.7}
+@media(min-width:760px){table{min-width:540px}}
+/* code */
+.codeblk{margin:20px 0}
+.clabel{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.8px;padding:4px 12px;border-radius:9px 9px 0 0;background:#14122b;color:#e9e4ff}
+.clabel.sim{background:#b45309}
+pre{background:#14122b;color:#e6e2f5;border-radius:0 14px 14px 14px;padding:19px;font-family:"JetBrains Mono",Consolas,monospace;font-size:12.5px;line-height:1.75;white-space:pre-wrap;word-break:break-word;overflow-x:auto}
+pre .cm{color:#8b93ad}pre .kw{color:#c4b5fd}pre .st{color:#6ee7b7}pre .fn{color:#fda4af}pre .nu{color:#fbbf24}
+/* details */
+details{background:#fbf9ff;border:1px solid var(--line);border-radius:12px;padding:13px 17px;margin:10px 0}
+details summary{cursor:pointer;font-weight:600;font-size:14.4px;color:var(--lav-700);list-style:none;display:flex;align-items:flex-start;gap:8px}
+details summary::-webkit-details-marker{display:none}
+details summary::before{content:'?';flex:0 0 auto;width:19px;height:19px;border-radius:50%;background:#f3e8ff;color:var(--lav-700);font-size:11px;display:flex;align-items:center;justify-content:center;font-weight:700;margin-top:3px}
+details[open] summary{margin-bottom:9px}
+details .ans{font-size:14.1px;color:var(--ink-soft);border-top:1px dashed var(--line);padding-top:9px}
+/* figures */
+figure{margin:26px 0;text-align:center}
+mjx-container svg{max-width:none;height:auto}
+.figure img{max-width:100%;width:auto;height:auto;display:block;margin:0 auto;border-radius:14px;border:1px solid var(--line);box-shadow:0 12px 34px -24px rgba(30,20,70,.42)}
+figcaption{font-size:12.7px;color:var(--ink-muted);margin-top:10px;text-align:left;line-height:1.75}
+figcaption b{color:var(--lav-700)}
+.svgwrap{margin:24px 0;text-align:center}
+.svgwrap > svg{width:100%;height:auto;max-width:860px}
+.svgcap{font-size:12.6px;color:var(--ink-muted);margin-top:8px;text-align:left;line-height:1.7}
+/* rq */
+.rq{background:linear-gradient(135deg,#fff7ed,#ffedd5);border:1px solid rgba(251,146,60,.36);border-radius:16px;padding:21px 23px;margin:22px 0}
+.rq .tag{background:#f97316;color:#fff;padding:2px 11px;border-radius:12px;font-size:11.5px;font-weight:700;letter-spacing:.5px}
+.rq h4{margin-top:9px;color:#7c2d12;font-size:1.04rem}
+.rq p,.rq li{color:#431407;font-size:14.4px}
+.rq .meta{margin-top:10px;font-size:13px;color:#9a3412;border-top:1px dashed rgba(249,115,22,.35);padding-top:8px}
+/* misc */
+.chnav{display:flex;justify-content:space-between;gap:12px;margin:40px 0 0;padding-top:20px;border-top:1px dashed var(--line)}
+.chnav a{flex:1;text-decoration:none;background:#fbf9ff;border:1px solid var(--line);border-radius:12px;padding:12px 15px;font-size:13px;color:var(--ink-soft)}
+.chnav a:hover{border-color:var(--lav-300);background:#f6f0ff}
+.chnav a.next{text-align:right}
+.chnav .lab{display:block;font-size:10.5px;color:var(--ink-muted);letter-spacing:1.4px;margin-bottom:3px}
+.chnav .ttl{font-weight:700;color:var(--lav-700);font-size:13.4px}
+.kv{display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));gap:12px;margin:20px 0}
+.kv .c{background:#fbf9ff;border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.kv .c .k{font-size:10.5px;letter-spacing:1px;color:var(--ink-muted);font-weight:700}
+.kv .c .v{font-family:"Noto Serif SC",serif;font-size:19px;color:var(--lav-700);font-weight:900;margin-top:2px}
+hr.sep{border:none;border-top:1px dashed var(--line);margin:32px 0}
+.small{font-size:13.3px;color:var(--ink-muted)}
+.center{text-align:center}
+footer{margin-left:var(--sidebar);padding:38px 34px 56px;background:#fbf9ff;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink-muted)}
+@media(max-width:1080px){footer{margin-left:0}}
+footer .fwrap{max-width:880px;margin:0 auto}
+#backtop{position:fixed;right:20px;bottom:20px;width:42px;height:42px;border-radius:50%;background:#fff;border:1px solid var(--line);box-shadow:0 8px 24px rgba(80,40,160,.16);display:flex;align-items:center;justify-content:center;text-decoration:none;color:var(--lav-700);font-size:16px;z-index:110;opacity:0;pointer-events:none;transition:.2s}
+#backtop.show{opacity:1;pointer-events:auto}
+@media(max-width:700px){
+  body{font-size:15.4px}
+  .wrap{padding:0 15px}
+  .hero{padding:74px 0 40px}
+  .hero h1{font-size:1.78rem}
+  pre{font-size:11.2px;padding:14px}
+  .deriv{padding:6px 13px 12px}
+  .kv{grid-template-columns:1fr 1fr}
+  .chnav{flex-direction:column}
+  .chnav a.next{text-align:left}
+  mjx-container{overflow-x:auto;overflow-y:hidden;max-width:100%}
+  li mjx-container,p mjx-container{max-width:100%}
+}
+</style>
+</head>
+<body>
+<div id="progress"></div>
+<button id="tocToggle">☰ 目录</button>
+<a href="#pagetop" id="backtop">↑</a>
+
+<nav id="sidebar">
+  <div class="sbrand">TaoMate<br>数字人的持久记忆</div>
+  <div class="ssub">ANCHOR-GUIDED MEMORY · arXiv 2607.24359</div>
+  <div class="sgrp">问题与结构</div>
+  <ol>
+    <li><a data-n="01" href="#ch1">五分钟后,她的脸变了</a></li>
+    <li><a data-n="02" href="#ch2">系统解剖:四个部件</a></li>
+  </ol>
+  <div class="sgrp">数学核心</div>
+  <ol>
+    <li><a data-n="03" href="#ch3">锚约束内存演化</a></li>
+    <li><a data-n="04" href="#ch4">置信门控</a></li>
+    <li><a data-n="05" href="#ch5">结构匹配条件化</a></li>
+  </ol>
+  <div class="sgrp">训练与推理</div>
+  <ol>
+    <li><a data-n="06" href="#ch6">因果上下文蒸馏</a></li>
+    <li><a data-n="07" href="#ch7">阶段并行推理</a></li>
+  </ol>
+  <div class="sgrp">证据</div>
+  <ol>
+    <li><a data-n="08" href="#ch8">实验核算</a></li>
+    <li><a data-n="09" href="#ch9">消融的悖论</a></li>
+  </ol>
+  <div class="sgrp">评估与前瞻</div>
+  <ol>
+    <li><a data-n="10" href="#ch10">批判性评估</a></li>
+    <li><a data-n="11" href="#ch11">自主科研问题</a></li>
+    <li><a data-n="12" href="#ch12">结论</a></li>
+  </ol>
+  <div class="sgrp">附录</div>
+  <ol>
+    <li><a data-n="A" href="#appA">代码</a></li>
+    <li><a data-n="B" href="#appB">公式总表</a></li>
+    <li><a data-n="C" href="#appC">符号与引用</a></li>
+  </ol>
+</nav>
+
+<main id="pagetop">
+<div class="hero">
+  <div class="wrap">
+    <div class="eyebrow">arXiv 2607.24359 · PREPRINT</div>
+    <h1>TaoMate:用一块"锚点"记住她最初的样子</h1>
+    <p class="lede">实时数字人最难的不是生成一帧像样的脸,而是<strong>第一百秒时那张脸还是同一个人</strong>。TaoMate 把"永远不变的视觉锚点"与"持续演化的音视频记忆"拆成两套东西,再让它们通过不同的通路进入模型——1000 秒不漂移,3 张卡 35 FPS。</p>
+    <div class="meta">
+      <span><i class="dot"></i>12 章 · 约 2.5 小时</span>
+      <span><i class="dot"></i>6 幅自绘可视化</span>
+      <span><i class="dot"></i>3 段代码</span>
+      <span><i class="dot"></i>5 个科研问题</span>
+    </div>
+
+    <div class="heroart">
+      <svg viewBox="0 0 880 400" role="img" aria-label="TaoMate 概念图:左侧不可变视觉锚点,中间演化记忆,右侧时间轴上稳定的多帧">
+        <defs>
+          <linearGradient id="anchorG" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#a855f7"/><stop offset="100%" stop-color="#6d28d9"/>
+          </linearGradient>
+          <linearGradient id="memG" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stop-color="#fda4af"/><stop offset="60%" stop-color="#fb7185"/><stop offset="100%" stop-color="#34d399"/>
+          </linearGradient>
+          <linearGradient id="frameG" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#f3e8ff"/><stop offset="100%" stop-color="#e9d5ff"/>
+          </linearGradient>
+          <filter id="soft2"><feGaussianBlur stdDeviation="7"/></filter>
+          <marker id="ar1" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path d="M0 0 L9 4.5 L0 9 z" fill="#9333ea"/></marker>
+          <marker id="ar2" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path d="M0 0 L9 4.5 L0 9 z" fill="#f43f5e"/></marker>
+        </defs>
+        <rect width="880" height="400" fill="#fdfbff"/>
+
+        <!-- left: immutable anchor -->
+        <g>
+          <circle cx="120" cy="150" r="78" fill="#a855f7" opacity=".12" filter="url(#soft2)"/>
+          <rect x="52" y="72" width="136" height="156" rx="16" fill="url(#frameG)" stroke="#c084fc" stroke-width="2"/>
+          <text x="120" y="60" text-anchor="middle" font-size="13" font-weight="700" fill="#6d28d9">不可变视觉锚点</text>
+          <text x="120" y="76" text-anchor="middle" font-size="10.5" fill="#9333ea">a^v · a^a</text>
+          <!-- simple face icon -->
+          <circle cx="120" cy="132" r="26" fill="#c4b5fd"/>
+          <rect x="98" y="162" width="44" height="46" rx="14" fill="#a78bfa"/>
+          <circle cx="111" cy="128" r="3" fill="#4c1d95"/><circle cx="129" cy="128" r="3" fill="#4c1d95"/>
+          <path d="M111 141 q9 7 18 0" stroke="#4c1d95" stroke-width="2" fill="none" stroke-linecap="round"/>
+          <rect x="78" y="196" width="84" height="26" rx="8" fill="#6d28d9"/>
+          <text x="120" y="214" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">λ = 0.20</text>
+          <text x="120" y="240" text-anchor="middle" font-size="9.5" fill="#7c3aed">锁形 · 每步重注入</text>
+        </g>
+
+        <!-- middle: evolving memory -->
+        <g>
+          <path d="M196 150 L246 150" stroke="#9333ea" stroke-width="2.4" marker-end="url(#ar1)"/>
+          <rect x="250" y="66" width="168" height="168" rx="18" fill="#fff" stroke="#e9d5ff" stroke-width="2"/>
+          <text x="334" y="58" text-anchor="middle" font-size="13" font-weight="700" fill="#be123c">自适应记忆</text>
+          <text x="334" y="88" text-anchor="middle" font-size="11.5" fill="#9f1239">m_t = E(m_{t-1}, a, s_t)</text>
+          <!-- three bars showing decay -->
+          <g>
+            <rect x="268" y="102" width="128" height="13" rx="6" fill="#fecdd3"/>
+            <rect x="268" y="102" width="112" height="13" rx="6" fill="#fb7185"/>
+            <text x="404" y="113" font-size="9.5" fill="#9f1239">t-1</text>
+            <rect x="268" y="124" width="128" height="13" rx="6" fill="#d1fae5"/>
+            <rect x="268" y="124" width="64" height="13" rx="6" fill="#34d399"/>
+            <text x="404" y="135" font-size="9.5" fill="#047857">c·w</text>
+            <rect x="268" y="146" width="128" height="13" rx="6" fill="#e0e7ff"/>
+            <rect x="268" y="146" width="37" height="13" rx="6" fill="#818cf8"/>
+            <text x="404" y="157" font-size="9.5" fill="#4338ca">c²·w</text>
+          </g>
+          <text x="334" y="182" text-anchor="middle" font-size="10.5" fill="#6b7280">c = (1−λ)(1−β) = 0.68</text>
+          <text x="334" y="199" text-anchor="middle" font-size="10.5" fill="#6b7280">几何衰减 · 半衰期 1.8 步</text>
+          <text x="334" y="218" text-anchor="middle" font-size="10.5" fill="#6d28d9">锚点稳态份额 62.5%</text>
+        </g>
+
+        <!-- right: stable frames on timeline -->
+        <g>
+          <path d="M424 150 L470 150" stroke="#f43f5e" stroke-width="2.4" marker-end="url(#ar2)"/>
+          <text x="447" y="140" text-anchor="middle" font-size="9.5" fill="#be123c">条件化</text>
+          <g>
+            <rect x="494" y="86" width="66" height="66" rx="10" fill="#f3e8ff" stroke="#c084fc" stroke-width="1.5"/>
+            <circle cx="527" cy="112" r="12" fill="#c4b5fd"/><rect x="517" y="126" width="20" height="18" rx="6" fill="#a78bfa"/>
+            <rect x="574" y="86" width="66" height="66" rx="10" fill="#f3e8ff" stroke="#c084fc" stroke-width="1.5"/>
+            <circle cx="607" cy="112" r="12" fill="#c4b5fd"/><rect x="597" y="126" width="20" height="18" rx="6" fill="#a78bfa"/>
+            <rect x="654" y="86" width="66" height="66" rx="10" fill="#f3e8ff" stroke="#c084fc" stroke-width="1.5"/>
+            <circle cx="687" cy="112" r="12" fill="#c4b5fd"/><rect x="677" y="126" width="20" height="18" rx="6" fill="#a78bfa"/>
+            <rect x="734" y="86" width="66" height="66" rx="10" fill="#f3e8ff" stroke="#c084fc" stroke-width="1.5"/>
+            <circle cx="767" cy="112" r="12" fill="#c4b5fd"/><rect x="757" y="126" width="20" height="18" rx="6" fill="#a78bfa"/>
+          </g>
+          <line x1="494" y1="166" x2="800" y2="166" stroke="#e9d5ff" stroke-width="2"/>
+          <g font-size="9.5" fill="#76738c" text-anchor="middle">
+            <text x="527" y="184">0s</text><text x="607" y="184">75s</text><text x="687" y="184">300s</text><text x="767" y="184">1000s</text>
+          </g>
+          <text x="647" y="212" text-anchor="middle" font-size="11.5" font-weight="700" fill="#047857">身份 · 服饰 · 场景保持一致</text>
+        </g>
+
+        <!-- bottom: three mechanisms -->
+        <g font-size="11" text-anchor="middle">
+          <rect x="52" y="264" width="240" height="46" rx="12" fill="#f5f3ff" stroke="#ddd6fe"/>
+          <text x="172" y="284" fill="#5b21b6" font-weight="700">① 不可变锚点</text>
+          <text x="172" y="300" fill="#7c3aed" font-size="10">永久参考,不参与衰减</text>
+
+          <rect x="306" y="264" width="240" height="46" rx="12" fill="#fff1f2" stroke="#fecdd3"/>
+          <text x="426" y="284" fill="#9f1239" font-weight="700">② 锚约束演化</text>
+          <text x="426" y="300" fill="#be123c" font-size="10">置信门控抑制坏观测</text>
+
+          <rect x="560" y="264" width="268" height="46" rx="12" fill="#ecfdf5" stroke="#a7f3d0"/>
+          <text x="694" y="284" fill="#065f46" font-weight="700">③ 阶段并行</text>
+          <text x="694" y="300" fill="#047857" font-size="10">反对角波前,3 卡 35 FPS</text>
+        </g>
+        <text x="440" y="352" text-anchor="middle" font-size="11" fill="#a49bc6">一个恒等式撑起全篇:z_t ~ p(z_t | e_t, C_{t−1}, M_{t−1}) ,  M_t = U(M_{t−1}, sg(z_t))</text>
+      </svg>
+      <p class="herocap">博客自绘:左侧锚点被永久保留并在每次更新中重新注入;中间自适应记忆按几何级数遗忘;右侧是结果——跨 1000 秒的一致身份。</p>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+
+<!-- ============ CH1 ============ -->
+<section id="ch1">
+  <div class="chhead"><div class="chnum">01</div><div>
+    <h2>五分钟后,她的脸变了</h2>
+    <div class="sub">长视频数字人的三种漂移,以及 KV cache 的两难</div>
+  </div></div>
+
+  <p class="lead">让模型生成 5 秒的说话视频,今天的扩散模型做得很好。让同一个模型连续生成 5 分钟——中间还要换动作、换台词、换镜头——问题就来了:<b>她不再是同一个人</b>。</p>
+
+  <h3>1.1 三种漂移,三种病因</h3>
+  <p>论文 Figure 1 给出了最直观的对照:同一个主体、同一段 300 秒的输出,上面一行是 OmniForcing,下面一行是 TaoMate。</p>
+
+  <div class="figure"><img src="assets/fig1_stability.png" alt="TaoMate 与 OmniForcing 在 300 秒上的稳定性对比">
+    <p class="figcap"><b>论文 Figure 1</b>(原图坐标裁剪):上行 OmniForcing 在 300 秒内出现明显的肤色偏移、面部结构变形与背景色漂移;下行 TaoMate 在 0s / 25s / 75s / 150s / 300s 五个时刻保持同一张脸、同一件毛衣、同一个书架的色调。中间那行是论文主张的三个机制。</p>
+  </div>
+
+  <p>把"漂移"拆开看,至少有三类,而且它们的病因完全不同:</p>
+  <div class="tw"><table>
+    <caption>三类漂移对应三种不同的数学机制——这是理解为什么"一个补丁不够"的关键。</caption>
+    <tr><th>漂移类型</th><th>看得见的现象</th><th>数学机制</th></tr>
+    <tr><td><b>外观漂移</b></td><td>肤色慢慢变、衣服颜色越来越不一样</td><td>通道级均值/方差被反复"重新估计",误差随机游走</td></tr>
+    <tr><td><b>结构漂移</b></td><td>脸型变了、五官比例变了</td><td>每一块都以"上一块的不完美预测"为条件,误差逐块累积</td></tr>
+    <tr><td><b>场景漂移</b></td><td>背景从暖黄慢慢变冷、构图偏移</td><td>长期证据离开 cache 后彻底消失,模型没有依据</td></tr>
+  </table></div>
+
+  <div class="svgwrap">
+  <svg viewBox="0 0 880 320" role="img" aria-label="三种漂移的机制示意">
+    <rect width="880" height="320" fill="#fdfbff" rx="16"/>
+    <text x="440" y="30" text-anchor="middle" font-size="14.5" font-weight="700" fill="#1a1730" font-family="Noto Serif SC,serif">三种漂移:同一个症状,三种不同的病</text>
+
+    <!-- panel 1: appearance random walk -->
+    <g>
+      <rect x="30" y="52" width="258" height="228" rx="14" fill="#fff1f2"/>
+      <text x="159" y="76" text-anchor="middle" font-size="12.5" font-weight="700" fill="#9f1239">① 外观:随机游走</text>
+      <text x="159" y="94" text-anchor="middle" font-size="10.5" fill="#be123c">每块的统计量都带一点误差</text>
+      <line x1="60" y1="200" x2="258" y2="200" stroke="#fecdd3" stroke-width="1.5"/>
+      <line x1="60" y1="110" x2="60" y2="230" stroke="#fecdd3" stroke-width="1.5"/>
+      <!-- random walk -->
+      <path d="M62 196 L84 186 L104 192 L124 174 L146 182 L168 160 L190 168 L212 148 L236 158" fill="none" stroke="#f43f5e" stroke-width="2.4"/>
+      <g fill="#f43f5e"><circle cx="62" cy="196" r="3"/><circle cx="104" cy="192" r="3"/><circle cx="146" cy="182" r="3"/><circle cx="190" cy="168" r="3"/><circle cx="236" cy="158" r="3"/></g>
+      <line x1="62" y1="196" x2="236" y2="196" stroke="#fda4af" stroke-dasharray="4 3" stroke-width="1.2"/>
+      <text x="159" y="222" text-anchor="middle" font-size="10.5" fill="#9f1239">无回归力 ⇒ 方差随 t 线性增长</text>
+      <text x="159" y="246" text-anchor="middle" font-size="11" font-weight="700" fill="#be123c">σ² ∝ t</text>
+      <text x="159" y="266" text-anchor="middle" font-size="10" fill="#9f1239">修法:必须有一个"绝对参考"</text>
+    </g>
+
+    <!-- panel 2: structural compounding -->
+    <g>
+      <rect x="306" y="52" width="258" height="228" rx="14" fill="#fef3c7"/>
+      <text x="435" y="76" text-anchor="middle" font-size="12.5" font-weight="700" fill="#78350f">② 结构:误差复合</text>
+      <text x="435" y="94" text-anchor="middle" font-size="10.5" fill="#b45309">z_t 的条件里含 z_{t-1} 的误差</text>
+      <g stroke="#f59e0b" stroke-width="2" fill="none">
+        <path d="M336 168 q22 -22 44 0" marker-end="url(#arE)"/>
+        <path d="M384 168 q22 -30 44 0" marker-end="url(#arE)"/>
+        <path d="M432 168 q22 -38 44 0" marker-end="url(#arE)"/>
+        <path d="M480 168 q22 -46 44 0" marker-end="url(#arE)"/>
+      </g>
+      <defs><marker id="arE" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0 0 L7 3.5 L0 7 z" fill="#f59e0b"/></marker></defs>
+      <g font-size="9.5" fill="#92400e" text-anchor="middle">
+        <text x="352" y="212">ε₁</text><text x="400" y="212">ε₁+ε₂</text><text x="448" y="212">Σε</text><text x="496" y="212">Σε</text>
+      </g>
+      <text x="435" y="240" text-anchor="middle" font-size="10.5" fill="#78350f">误差沿因果链累积,不会自愈</text>
+      <text x="435" y="262" text-anchor="middle" font-size="10" fill="#92400e">修法:训练时就让学生看自己的错误</text>
+    </g>
+
+    <!-- panel 3: context loss -->
+    <g>
+      <rect x="582" y="52" width="268" height="228" rx="14" fill="#eff6ff"/>
+      <text x="716" y="76" text-anchor="middle" font-size="12.5" font-weight="700" fill="#1e3a8a">③ 场景:证据消失</text>
+      <text x="716" y="94" text-anchor="middle" font-size="10.5" fill="#1d4ed8">窗口滑走后,早期 tokens 被丢弃</text>
+      <g>
+        <rect x="606" y="120" width="40" height="52" rx="6" fill="#bfdbfe" stroke="#60a5fa"/>
+        <rect x="650" y="120" width="40" height="52" rx="6" fill="#bfdbfe" stroke="#60a5fa"/>
+        <rect x="694" y="120" width="40" height="52" rx="6" fill="#bfdbfe" stroke="#60a5fa"/>
+        <rect x="738" y="120" width="40" height="52" rx="6" fill="#e5e7eb" stroke="#d1d5db" stroke-dasharray="4 3"/>
+        <rect x="782" y="120" width="40" height="52" rx="6" fill="#e5e7eb" stroke="#d1d5db" stroke-dasharray="4 3"/>
+      </g>
+      <text x="626" y="152" text-anchor="middle" font-size="10" fill="#1e40af">在</text>
+      <text x="670" y="152" text-anchor="middle" font-size="10" fill="#1e40af">在</text>
+      <text x="714" y="152" text-anchor="middle" font-size="10" fill="#1e40af">在</text>
+      <text x="758" y="152" text-anchor="middle" font-size="10" fill="#9ca3af">丢</text>
+      <text x="802" y="152" text-anchor="middle" font-size="10" fill="#9ca3af">丢</text>
+      <path d="M600 194 L802 194" stroke="#dbeafe" stroke-width="2"/>
+      <text x="716" y="214" text-anchor="middle" font-size="10.5" fill="#1e3a8a">cache 有界 ⇒ 长期证据无处安放</text>
+      <text x="716" y="238" text-anchor="middle" font-size="10.5" fill="#1e3a8a">全历史 ⇒ 显存与注意力随时长增长</text>
+      <text x="716" y="260" text-anchor="middle" font-size="10" fill="#1d4ed8">修法:压缩成定长记忆,放到 cache 之外</text>
+    </g>
+  </svg>
+  <p class="svgcap" style="text-align:center"><b>SVG ①|自绘</b> —— 三类漂移的机制完全不同,所以任何单一补丁都只能治一种。</p>
+  </div>
+
+  <h3>1.2 KV cache 的两难:论文的出发点</h3>
+  <p>自回归生成时,模型需要"看见"之前生成的东西才能保持一致。看见的方式是把过去的 token 的 Key/Value 缓存下来(叫 KV cache)。这里有一个硬约束:</p>
+  <div class="tw"><table>
+    <tr><th>做法</th><th>好处</th><th>代价</th></tr>
+    <tr><td><b>有界 cache</b>(只留最近 N 块)</td><td>显存与算力恒定,能无限生成</td><td>更早的主体/场景/声学证据<b>被永久丢弃</b>。300 秒后模型已经"忘了"她原来长什么样</td></tr>
+    <tr><td><b>全历史 cache</b></td><td>信息完整</td><td>注意力 \(O(L^2)\)、显存 \(O(L)\);而且更糟的是——<b>它反复以自己旧的、不完美的预测为条件</b>,错误被当成事实不断强化</td></tr>
+  </table></div>
+  <p>论文的原话是:保留完整生成历史会让"注意力和存储随持续时间增长,并反复让生成器以旧的、不完美的预测为条件"。</p>
+  <div class="note"><span class="btag">第二个代价更隐蔽</span>
+    <h4>为什么"看得更多"反而更差</h4>
+    <p>直觉上信息越多越好。但在自回归生成里,历史不是干净的——它是模型自己产出的、带误差的内容。当你把这段历史当作条件,你在做的是<b>把自己过去的错误当作既成事实</b>。误差像滚雪球:第一块脸偏了 2%,第二块以"偏 2% 的脸"为参考再偏 2%,依此类推。所以"全历史"不是解药,它甚至可能加剧结构漂移——只是让场景漂移得到缓解。</p>
+  </div>
+
+  <h3>1.3 因果蒸馏为什么也没解决</h3>
+  <p>近两年有一类方法叫"因果蒸馏"(Self-Forcing 等,论文引用 Huang et al. 2025a;Zhu et al. 2026):让一个双向的 teacher 模型教一个只看过去的 student,并且训练时就用 student 自己生成的历史当条件,以减少"训练看得见未来、推理看不见"的差距(这叫 exposure bias)。</p>
+  <p>论文指出这还不够,理由很精确:</p>
+  <div class="deriv">
+    <div class="dtitle">论点的形式化</div>
+    <div class="step"><div class="sn">①</div><div class="sc">
+      <p style="margin:0">teacher 的条件是<b>真实/干净的双向上下文</b>,记为 \(c^{\text{teacher}}\);student 部署时的条件是<b>自己生成的因果历史</b>,记为 \(c^{\text{student}}\)。</p>
+    </div></div>
+    <div class="step"><div class="sn">②</div><div class="sc">
+      <p style="margin:0">即使做了自回归蒸馏,仍然有分布差:</p>
+      <div class="eq">$$p_{\text{train}}(c^{\text{student}}) \neq p_{\text{deploy}}(c^{\text{student}})$$</div>
+      <div class="why">因为训练时的 student 历史只滚了有限步、且仍可能混入干净前缀;部署时要滚上千步,误差分布早已不同。</div>
+    </div></div>
+    <div class="step"><div class="sn">③</div><div class="sc">
+      <p style="margin:0"><b>而且</b>:即使蒸馏完美,<b>信息本身也不在</b>。有界 cache 意味着第 1 块的证据在很久之后根本不在条件里。这不是"分布匹配"能解决的问题,而是"信息容量"问题。</p>
+      <div class="why">这就是为什么 TaoMate 要同时做两件事:加记忆(解决信息容量)+ 改蒸馏(解决分布匹配)。只做后者是不够的。</div>
+    </div></div>
+  </div>
+
+  <h3>1.4 论文的三条主张</h3>
+  <div class="kv">
+    <div class="c"><div class="k">主张一</div><div class="v">把记忆搬出 cache</div></div>
+    <div class="c"><div class="k">主张二</div><div class="v">蒸馏时加入自己的错</div></div>
+    <div class="c"><div class="k">主张三</div><div class="v">阶段并行免重训</div></div>
+  </div>
+  <p>对应论文的三条贡献:"锚点引导的持久多模态记忆"、"rollout 对齐的因果蒸馏"、"免训练的阶段并行推理"。后面三章逐一拆解它们的数学。</p>
+
+  <div class="chnav">
+    <a href="#ch2"><span class="lab">下一章</span><span class="ttl">系统解剖:四个部件 →</span></a>
+  </div>
+</section>
+
+<!-- ============ CH2 ============ -->
+<section id="ch2">
+  <div class="chhead"><div class="chnum">02</div><div>
+    <h2>系统解剖:四个部件</h2>
+    <div class="sub">从"条件怎么进来"到"输出怎么出去"</div>
+  </div></div>
+
+  <p class="lead">TaoMate 不是一个新的扩散骨架。它是在一个已有的联合音视频 DiT(论文明确说初始化自蒸馏过的 LTX-2.3 checkpoint)外面,加了一套<b>记忆系统</b>。所以理解它的关键是理解"记忆怎么存、怎么更新、怎么被读出来"。</p>
+
+  <h3>2.1 分解树</h3>
+  <div class="tree" style="background:#fbf9ff;border:1px solid var(--line);border-radius:14px;padding:18px 20px;font-family:Consolas,monospace;font-size:12.7px;line-height:1.95;color:var(--ink-soft);overflow-x:auto;white-space:pre"><b>TaoMate</b>
+├── <b>① 有界活动上下文 C_{t−1}</b>(在 cache 里,带位置)
+│   ├── 初始参考 sink(未压缩、带 RoPE 位置)
+│   └── 最近 ≤2 个干净块
+│   └── 作用:细粒度动作、姿态、音素连续性
+│
+├── <b>② 持久记忆 M_t</b>(在 cache 之外,定长、无位置)
+│   ├── 固定参考:a^v(视觉锚点) + a^a(音频参考)   ← 只从第 0 块实例化一次
+│   ├── 自适应内容:m^v_t(视频) + m^a_t(音频)        ← 每块更新
+│   └── 外观统计:κ_t(通道均值/尺度) + π_t(低频)    ← 每块更新,门更严
+│   └── 作用:身份、场景、音色;成本与时长无关
+│
+├── <b>③ 记忆条件化</b>(两条通路)
+│   ├── 内容 → MemAttn(跨模态残差注意力,RMSNorm 后)
+│   └── 外观 → Reference-aware FiLM(γ(c)⊙x + b(c))
+│
+├── <b>④ 训练</b>:rollout 对齐的因果蒸馏
+│   ├── 混合视野 H∈{5,10},概率 {0.8,0.2}
+│   ├── 学生生成前缀(概率 0.1)
+│   └── 非锚历史注入噪声 σ~U(0,0.15);锚点保持干净
+│
+└── <b>⑤ 推理</b>:阶段并行(窗口化 + 反对角波前)
+    ├── 跨窗口状态 S_{n−1} = (P_{n−1}, M_{n−1})
+    └── 每个 rank 一个去噪阶段,独立 KV cache</div>
+
+  <div class="figure"><img src="assets/fig2_pipeline.png" alt="TaoMate 管线图">
+    <p class="figcap"><b>论文 Figure 2</b>:左侧是固定锚点库(Anchor Bank)与循环记忆库(Memory Bank);中间是联合音视频 DiT,含两条条件化通路(Memory side attention / Reference-aware FiLM);右侧是三种更新器——视频"Gated"、音频"Tethered"、外观"Gated"。注意所有更新器旁边都标了 <code>stop-gradient</code>。</p>
+  </div>
+
+  <h3>2.2 那个恒等式:为什么它能"无限长"</h3>
+  <p>论文的式 (1) 是全文的地基:</p>
+  <div class="eq">$$z_t \sim p_\theta\big(z_t \,\big|\, e_t,\ C_{t-1},\ M_{t-1}\big),\qquad M_t = \mathcal U\big(M_{t-1},\ \mathrm{sg}(z_t)\big)$$</div>
+  <div class="tw"><table>
+    <tr><th>符号</th><th>含义</th><th>为什么关键</th></tr>
+    <tr><td>\(z_t=(z^v_t,z^a_t)\)</td><td>第 t 个块的音视频潜变量</td><td>块是生成的最小单位;同一文本条件的连续块组成一个"提示段"</td></tr>
+    <tr><td>\(e_t\)</td><td>该块对应的文本条件</td><td>动作、台词、镜头都在这里</td></tr>
+    <tr><td>\(C_{t-1}\)</td><td>有界活动上下文</td><td>带位置,管局部连续性</td></tr>
+    <tr><td>\(M_{t-1}\)</td><td>持久记忆</td><td>定长,管长期一致性;<b>成本与已生成时长无关</b></td></tr>
+    <tr><td>\(\mathrm{sg}(\cdot)\)</td><td>stop-gradient</td><td>切断反向传播,避免"穿过无限长记忆更新链"求梯度</td></tr>
+  </table></div>
+
+  <div class="insight"><span class="btag">深度洞察</span>
+    <h4>这个式子的精妙之处:条件只来自过去,而记忆是"被写,不被反传"</h4>
+    <p>注意 \(M_t\) 的更新用的是 \(\mathrm{sg}(z_t)\)——当前块对记忆的写入<b>不参与梯度</b>。这一条同时解决两个问题:</p>
+    <p>(1) <b>计算</b>:如果记忆更新可微,那么第 100 块的对数似然要对前 99 次更新求导,计算图会无限长。sg 一刀切断。</p>
+    <p>(2) <b>因果性</b>:\(M_t\) 在 \(z_t\) 生成<b>之后</b>才更新,所以第 t 块的条件里只含"前面块"的信息。这保证了训练和推理的时间箭头一致。</p>
+    <p>代价是:记忆更新规则(\(\beta,\lambda\)、门控)不能通过端到端学习得到,必须手工设计。这就是为什么第 3、4 章那些公式存在——<b>它们是"不能学"的部分,所以必须算清楚</b>。</p>
+  </div>
+
+  <h3>2.3 记忆里到底存了什么</h3>
+  <div class="figure"><img src="assets/fig3_stageparallel.png" alt="阶段并行推理示意">
+    <p class="figcap"><b>论文 Figure 3</b>:阶段并行推理。横轴是块(Block 0..b),纵轴是去噪阶段(Step 1..3)。黄色箭头是 KV cache(同阶段向前),蓝色箭头是去噪推进(同块向下一阶段),红色箭头只在最后阶段结束、块已干净时才更新记忆。所以<b>同时可执行的任务落在反对角线上</b>。</p>
+  </div>
+
+  <p>论文把 \(M_t\) 拆成六样东西(式 2):</p>
+  <div class="eq">$$M_t=\big(a^v,\ a^a,\ m^v_t,\ m^a_t,\ \kappa_t,\ \pi_t\big)$$</div>
+  <div class="tw"><table>
+    <caption>六个分量按"更新速度"排开——这是本章最值得记住的一张表:越快变化的东西,λ 越小(越信观测);越该稳定的东西,λ 越大(越信锚点)。</caption>
+    <tr><th>分量</th><th>是什么</th><th>从哪来</th><th>更新吗</th><th>参数 (β, λ)</th></tr>
+    <tr><td>\(a^v\)</td><td>视觉锚点(压缩后的初始块)</td><td>第 0 块</td><td><b>永不更新</b></td><td>—</td></tr>
+    <tr><td>\(a^a\)</td><td>音频参考(初始声学特征)</td><td>第 0 块</td><td>永不更新</td><td>—</td></tr>
+    <tr><td>\(m^v_t\)</td><td>视频内容记忆(空间结构)</td><td>每块的归一化空间表示</td><td>门控更新</td><td>(0.15, 0.20)</td></tr>
+    <tr><td>\(m^a_t\)</td><td>音频内容记忆(声学结构)</td><td>每块的归一化时间表示</td><td>无门控更新</td><td>(0.10, 0.10)</td></tr>
+    <tr><td>\(\kappa_t\)</td><td>通道级外观统计(均值、尺度)</td><td>原始视觉潜变量</td><td>门控 + 硬拒绝</td><td>(0.03, 0.60)</td></tr>
+    <tr><td>\(\pi_t\)</td><td>低频外观(粗空间统计)</td><td>去噪后的视觉潜变量</td><td>门控 + 硬拒绝</td><td>(0.03, 0.60)</td></tr>
+  </table></div>
+
+  <div class="warn"><span class="btag">一个容易忽略的区分</span>
+    <h4>压缩锚点 ≠ 位置化初始潜变量</h4>
+    <p>论文专门用一句话澄清这件事:压缩后的视觉锚点 \(a^v\) 和活动上下文 \(C_t\) 里保留的"未压缩、带位置的初始视觉潜变量"是<b>两个不同的东西</b>。</p>
+    <p>前者是<b>紧凑的长期参考证据</b>(经过投影、定长、无位置);后者是<b>token 级的显式条件</b>(参与因果注意力、带 RoPE 位置)。两者都存在,是因为它们回答不同的问题:"她长什么样"(锚点) vs "上一帧之后该接什么"(活动上下文)。</p>
+  </div>
+
+  <h3>2.4 从条件到输出的两条通路</h3>
+  <p>记忆不是简单拼到序列里。论文明确反对这样做(见第 5 章),而是分成两条结构上匹配的通路:</p>
+  <div class="eq">$$\tilde h^m_\ell = h^m_\ell + \mathrm{MemAttn}^m_\ell\big(\mathrm{RMSNorm}(h^m_\ell),\ u^m_{t-1}\big)$$</div>
+  <div class="eq">$$\hat h^v_\ell = \tilde h^v_\ell + \gamma_\ell(c_{t-1})\odot \mathrm{RMSNorm}(\tilde h^v_\ell) + b_\ell(c_{t-1})$$</div>
+  <p>第一行:<b>内容</b>通过跨模态注意力检索(query 是当前特征,key/value 是记忆);第二行:<b>外观</b>通过 FiLM 做通道级的仿射调制。为什么这样分,第 5 章给理由。</p>
+
+  <h3>2.5 规模与成本</h3>
+  <div class="tw"><table>
+    <tr><th>项</th><th>数值</th><th>备注</th></tr>
+    <tr><td>总参数</td><td>22.1B</td><td>Table 1 口径(基线 LTX-2.3 为 22B)</td></tr>
+    <tr><td>新增可训练参数</td><td>约 97.8M</td><td>模态编码器 + 视频 FiLM + 记忆分支;<b>只占 0.44%</b></td></tr>
+    <tr><td>记忆注意力插入</td><td>每 4 层,48 层中 12 层</td><td>不是全层插入——省算力的选择</td></tr>
+    <tr><td>记忆 token 数</td><td>视频 48 / 音频 64</td><td><b>定长</b>,与已生成时长无关</td></tr>
+    <tr><td>去噪步数</td><td>每块 3 步</td><td>few-step,实时性前提</td></tr>
+  </table></div>
+
+  <div class="insight"><span class="btag">深度洞察</span>
+    <h4>0.44% 的参数解决 22B 模型的问题,这说明瓶颈不在"容量"</h4>
+    <p>整个方法只增加 97.8M 参数,却把长视频一致性从 0.9619 拉到 0.9755、颜色漂移减半。这反过来说明:<b>22B 的主干并不缺表达能力,它缺的是"信息通路"</b>。</p>
+    <p>这很像人类记忆:你的大脑并不是因为神经元不够才忘记十年前的事,而是因为那些信息没有合适的检索路径。TaoMate 的贡献本质上是<b>给一个已经很聪明但健忘的模型,装了一套档案系统</b>。</p>
+  </div>
+
+  <div class="chnav">
+    <a href="#ch1"><span class="lab">上一章</span><span class="ttl">← 五分钟后,她的脸变了</span></a>
+    <a class="next" href="#ch3"><span class="lab">下一章</span><span class="ttl">锚约束内存演化 →</span></a>
+  </div>
+</section>
+<!-- ============ CH3 ============ -->
+<section id="ch3">
+  <div class="chhead"><div class="chnum">03</div><div>
+    <h2>数学核心 I:锚约束的内存演化</h2>
+    <div class="sub">一个三行公式,藏着权重守恒、几何遗忘与稳态份额三个结论</div>
+  </div></div>
+
+  <p class="lead">这一章只讲论文式 (4)。它看起来像小学生都会的加权平均,但把它展开之后,你会发现三件论文没有明说、却决定了整个系统行为的事情。</p>
+
+  <h3>3.1 公式与三个系数</h3>
+  <div class="def"><span class="btag">定义 3.1 · 锚约束的在线估计(论文式 4)</span>
+    <div class="eq" style="margin:10px 0">$$\mathcal E(m,\ a,\ s;\ \beta,\ \lambda) \;=\; (1-\lambda)\big[(1-\beta)m+\beta s\big] \;+\; \lambda a$$</div>
+    <p>三个输入:<br>
+    \(m\) = 上一次的估计(previous estimate)<br>
+    \(s\) = 当前块的观测(observation)<br>
+    \(a\) = 固定参考(anchor)<br>
+    两个旋钮:\(\beta\) 控制"多信新观测",\(\lambda\) 控制"多信锚点"。</p>
+  </div>
+  <p>展开后,三个输入各自的系数是:</p>
+  <div class="eq">$$\underbrace{(1-\lambda)(1-\beta)}_{m\text{ 的系数}}\;,\qquad \underbrace{(1-\lambda)\beta}_{s\text{ 的系数}}\;,\qquad \underbrace{\lambda}_{a\text{ 的系数}}$$</div>
+
+  <div class="deriv">
+    <div class="dtitle">命题 3.1 · 三个系数非负且和为 1(所以它是重心)</div>
+    <div class="step"><div class="sn">①</div><div class="sc">
+      <p style="margin:0"><b>非负性。</b>假设 \(0\le\beta\le1\)、\(0\le\lambda\le1\),则 \(1-\lambda\ge0\)、\(1-\beta\ge0\)、\(\beta\ge0\)、\(\lambda\ge0\)。三个系数都是非负数乘积或本身,所以非负。</p>
+    </div></div>
+    <div class="step"><div class="sn">②</div><div class="sc">
+      <p style="margin:0"><b>和为 1。</b>把三项加起来:</p>
+      <div class="eq" style="margin:10px 0">$$(1-\lambda)(1-\beta)+(1-\lambda)\beta+\lambda$$</div>
+    </div></div>
+    <div class="step"><div class="sn">③</div><div class="sc">
+      <p style="margin:0">前两项先合并:\((1-\lambda)\big[(1-\beta)+\beta\big]=(1-\lambda)\cdot1=1-\lambda\)。</p>
+      <div class="why">这一步是关键:\((1-\beta)+\beta=1\) 恒成立,不管 \(\beta\) 取多少。</div>
+    </div></div>
+    <div class="step"><div class="sn">④</div><div class="sc">
+      <p style="margin:0">再加上 \(\lambda\):\((1-\lambda)+\lambda=1\)。∎</p>
+    </div></div>
+    <div class="step"><div class="sn">⑤</div><div class="sc">
+      <p style="margin:0"><b>几何意义。</b>权重非负、和为 1 \(\Rightarrow\) \(\mathcal E\) 落在三点 \(m,s,a\) 构成的三角形内,且是三者的<b>加权欧氏重心</b>。所以这个更新永远<b>不越界</b>——不会因为"平均"而跑到一个谁也没见过的区域去。这是它比"直接相加/拼接"稳健的根本原因。</p>
+      <div class="why">论文只用一句话说了这件事("nonnegative and sum to one, making E their weighted Euclidean barycenter"),但它值得被当成一条定理。</div>
+    </div></div>
+  </div>
+
+  <h3>3.2 展开递推:一个几何级数</h3>
+  <p>把式 (4) 当成时间上的递推,记 \(m_t\leftarrow\mathcal E(m_{t-1},a,s_t;\beta,\lambda)\),并令</p>
+  <div class="eq">$$c\;\triangleq\;(1-\lambda)(1-\beta)$$</div>
+  <p>则递推变成标准的一阶线性形式:</p>
+  <div class="eq">$$m_t \;=\; c\,m_{t-1} \;+\; (1-\lambda)\beta\,s_t \;+\; \lambda\,a$$</div>
+
+  <div class="deriv">
+    <div class="dtitle">命题 3.2 · 显式解与几何遗忘</div>
+    <div class="step"><div class="sn">①</div><div class="sc">
+      <p style="margin:0">展开一步:</p>
+      <div class="eq" style="margin:10px 0">$$m_t = c\,m_{t-1} + b\,s_t + \lambda a,\qquad b\triangleq(1-\lambda)\beta$$</div>
+    </div></div>
+    <div class="step"><div class="sn">②</div><div class="sc">
+      <p style="margin:0">再展开 \(m_{t-1}\),然后 \(m_{t-2}\)……得到:</p>
+      <div class="eq" style="margin:10px 0">$$m_t \;=\; c^{t}m_0 \;+\; b\sum_{k=0}^{t-1}c^{k}s_{t-k} \;+\; \lambda a\sum_{k=0}^{t-1}c^{k}$$</div>
+      <div class="why">验证:把 \(k=0\) 项取出得 \(b s_t+\lambda a\),剩下 \(c\big[c^{t-1}m_0+b\sum_{k=0}^{t-2}c^k s_{t-1-k}+\lambda a\sum_{k=0}^{t-2}c^k\big]\),正好还原递推。</div>
+    </div></div>
+    <div class="step"><div class="sn">③</div><div class="sc">
+      <p style="margin:0"><b>读第二项。</b>\(b c^{k}\) 是"\(k\) 步之前的那个观测 \(s_{t-k}\)"的权重。因为 \(0 \lt c \lt 1\),这个权重按 \(k\) <b>几何衰减</b>。</p>
+      <div class="why">论文原文:"the coefficient of an observation from \(k\) updates earlier is \((1-\lambda)\beta[(1-\lambda)(1-\beta)]^{k}\)"——与上式完全一致,已验证。<b>历史证据和孤立的误差都按几何级数衰减</b>,这是它能抗漂移的数学原因:一次坏观测的影响不会永久留着。</div>
+    </div></div>
+    <div class="step"><div class="sn">④</div><div class="sc">
+      <p style="margin:0"><b>读第三项。</b>锚点的权重是 \(\lambda c^{k}\) 的<b>累加</b>,不是单项。因为锚点<b>每一次更新都被重新注入</b>,所以它不衰减,而是不断累积。</p>
+      <div class="why">这就是"锚"与"观测"的本质区别:观测只出现一次,锚点每一轮都回来。</div>
+    </div></div>
+    <div class="step"><div class="sn">⑤</div><div class="sc">
+      <p style="margin:0"><b>半衰期。</b>令 \(c^{k}=1/2\),得 \(k_{1/2}=\dfrac{\ln(1/2)}{\ln c}=\dfrac{-\ln2}{\ln c}\)。</p>
+    </div></div>
+  </div>
+
+  <h3>3.3 稳态份额:锚点到底占多少</h3>
+  <p>令 \(t\to\infty\),则 \(c^t\to0\),而几何级数 \(\sum_{k=0}^{\infty}c^{k}=\dfrac{1}{1-c}\)。于是:</p>
+  <div class="eq">$$m_\infty \;=\; \underbrace{\frac{b}{1-c}}_{\text{观测的稳态权重}}\cdot \bar s \;+\; \underbrace{\frac{\lambda}{1-c}}_{\text{锚点的稳态权重}}\cdot a$$</div>
+  <p>注意 \(\bar s\) 是各期观测的加权平均。现在验证两个权重加起来是否等于 1——这个验证很漂亮:</p>
+  <div class="deriv">
+    <div class="dtitle">命题 3.3 · 稳态份额恰好归一</div>
+    <div class="step"><div class="sn">①</div><div class="sc">
+      <p style="margin:0">需要证 \(\dfrac{b+\lambda}{1-c}=1\),即 \(b+\lambda=1-c\)。代入定义 \(b=(1-\lambda)\beta\)、\(c=(1-\lambda)(1-\beta)\):</p>
+      <div class="eq" style="margin:10px 0">$$b+\lambda=(1-\lambda)\beta+\lambda$$</div>
+      <div class="eq" style="margin:10px 0">$$1-c=1-(1-\lambda)(1-\beta)=1-\big[1-\lambda-\beta+\lambda\beta\big]=\lambda+\beta-\lambda\beta$$</div>
+    </div></div>
+    <div class="step"><div class="sn">②</div><div class="sc">
+      <p style="margin:0">比较两式右边:</p>
+      <div class="eq" style="margin:10px 0">$$(1-\lambda)\beta+\lambda=\beta-\lambda\beta+\lambda=\lambda+\beta-\lambda\beta$$</div>
+      <div class="why">两边完全相同。∎ 所以稳态时,锚点与观测的权重依然严格归一——<b>这个更新在任何时刻都不会"漏掉"或"多算"信息份额</b>。</div>
+    </div></div>
+    <div class="step"><div class="sn">③</div><div class="sc">
+      <p style="margin:0">因此可以写出两个干净的份额公式:</p>
+      <div class="eq" style="margin:10px 0">$$\boxed{\ \text{锚点份额}=\frac{\lambda}{\lambda+\beta-\lambda\beta},\qquad \text{观测份额}=\frac{(1-\lambda)\beta}{\lambda+\beta-\lambda\beta}\ }$$</div>
+    </div></div>
+  </div>
+
+  <h4>代入论文的三组超参,算出它们各自的"性格"</h4>
+  <div class="tw"><table>
+    <caption>这张表是本文最有信息量的一张原创表:三组超参不是随手调的,它们对应三种完全不同的"记忆性格"。</caption>
+    <tr><th>用途</th><th>(β, λ)</th><th>c</th><th>锚点稳态份额</th><th>观测份额</th><th>半衰期</th><th>解读</th></tr>
+    <tr><td><b>视频</b></td><td>(0.15, 0.20)</td><td>0.680</td><td><b>62.5%</b></td><td>37.5%</td><td>1.80 步</td><td>锚点为主,但允许明显的姿态/场景演化</td></tr>
+    <tr><td><b>音频</b></td><td>(0.10, 0.10)</td><td>0.810</td><td><b>52.6%</b></td><td>47.4%</td><td>3.29 步</td><td>几乎一半一半,衰减最慢——音节变化快,必须灵活</td></tr>
+    <tr><td><b>外观</b></td><td>(0.03, 0.60)</td><td>0.388</td><td><b>98.0%</b></td><td>1.96%</td><td>0.73 步</td><td>几乎完全锁死在锚点,观测只有 2% 的话语权</td></tr>
+  </table></div>
+
+  <div class="insight"><span class="btag">深度洞察</span>
+    <h4>外观分支的 98%:这不是"调参",这是"投降"</h4>
+    <p>外观分支的锚点份额高达 <b>98.0%</b>,意味着无论后面生成什么,颜色和对比度基本不会变。这解释了为什么 TaoMate 的 Color Δ 能低到 0.0026(比第二名低 51.9%)——它几乎<b>放弃了对颜色的自适应</b>。</p>
+    <p>这是一个非常果断的工程取舍:颜色/对比度这类<b>全局低频信息</b>,几乎不需要随剧情变化;而一旦允许它慢慢跟,就会变成随机游走(第 1 章的面板①)。所以作者把它钉死。</p>
+    <p><b>代价</b>也是明摆着的:如果场景真的需要换灯光(比如"走到窗边"),这个分支几乎不会响应,只能靠 FiLM 的动态部分去补。论文没有讨论这种失败情形——这是一个可以追问的点(见第 11 章 RQ2)。</p>
+  </div>
+
+  <div class="svgwrap">
+  <svg viewBox="0 0 880 340" role="img" aria-label="几何衰减曲线:三种参数配置下的观测权重">
+    <rect width="880" height="340" fill="#fdfbff" rx="16"/>
+    <text x="440" y="28" text-anchor="middle" font-size="14" font-weight="700" fill="#1a1730" font-family="Noto Serif SC,serif">观测的权重按 c^k 几何衰减 —— 三条曲线,三种记忆性格</text>
+    <!-- axes -->
+    <g>
+      <line x1="90" y1="280" x2="800" y2="280" stroke="#d8cfea" stroke-width="2"/>
+      <line x1="90" y1="60" x2="90" y2="280" stroke="#d8cfea" stroke-width="2"/>
+      <g font-size="11" fill="#76738c" text-anchor="middle">
+        <text x="90" y="300">0</text><text x="180" y="300">2</text><text x="270" y="300">4</text>
+        <text x="360" y="300">6</text><text x="450" y="300">8</text><text x="540" y="300">10</text>
+        <text x="630" y="300">12</text><text x="720" y="300">14</text>
+        <text x="445" y="322" fill="#4c4b5e">距当前的步数 k</text>
+      </g>
+      <g font-size="11" fill="#76738c" text-anchor="end">
+        <text x="80" y="284">0</text><text x="80" y="230">0.25</text><text x="80" y="175">0.5</text><text x="80" y="120">0.75</text><text x="80" y="66">1</text>
+      </g>
+      <text x="38" y="175" font-size="11" fill="#4c4b5e" transform="rotate(-90 38 175)" text-anchor="middle">相对权重</text>
+    </g>
+    <!-- normalized decay curves: c^k / c^0 -->
+    <!-- video c=0.68 : half-life 1.8 -->
+    <path d="M90 60 L112 92 L134 117 L156 136 L178 152 L200 165 L222 175 L244 184 L266 191 L288 197 L310 202 L332 206 L354 209 L376 212 L398 215 L420 217 L442 219 L464 220 L486 222 L508 223 L530 224 L552 225 L574 226 L596 226 L618 227 L640 227 L662 228 L684 228 L706 229 L728 229 L750 229 L772 230 L794 230"
+          fill="none" stroke="#f43f5e" stroke-width="2.8"/>
+    <!-- audio c=0.81 -->
+    <path d="M90 60 L134 84 L178 101 L222 114 L266 125 L310 134 L354 141 L398 147 L442 152 L486 156 L530 160 L574 163 L618 166 L662 168 L706 170 L750 172 L794 174"
+          fill="none" stroke="#3b82f6" stroke-width="2.8"/>
+    <!-- appearance c=0.388 -->
+    <path d="M90 60 L112 103 L134 129 L156 146 L178 158 L200 166 L222 172 L244 176 L266 180 L288 182 L310 184 L332 186 L354 187 L376 188 L398 188 L420 189 L442 189 L464 189 L486 190 L508 190 L530 190 L552 190 L574 190 L596 190 L618 190 L640 190 L662 190 L684 190 L706 190 L728 190 L750 190 L772 190 L794 190"
+          fill="none" stroke="#10b981" stroke-width="2.8"/>
+    <!-- half-life markers -->
+    <g stroke-dasharray="4 3" stroke-width="1.3">
+      <line x1="171" y1="60" x2="171" y2="280" stroke="#f43f5e" opacity=".55"/>
+      <line x1="359" y1="60" x2="359" y2="280" stroke="#3b82f6" opacity=".55"/>
+      <line x1="122" y1="60" x2="122" y2="280" stroke="#10b981" opacity=".55"/>
+    </g>
+    <g font-size="10" text-anchor="middle">
+      <text x="171" y="52" fill="#be123c">视频 1.80</text>
+      <text x="359" y="52" fill="#1d4ed8">音频 3.29</text>
+      <text x="122" y="42" fill="#047857">外观 0.73</text>
+    </g>
+    <!-- legend -->
+    <g font-size="11.5" font-family="Noto Sans SC,sans-serif">
+      <rect x="560" y="86" width="240" height="82" rx="10" fill="#fff" stroke="#e9e4f5"/>
+      <line x1="574" y1="108" x2="602" y2="108" stroke="#f43f5e" stroke-width="2.8"/>
+      <text x="610" y="112" fill="#9f1239">视频 c=0.680</text>
+      <line x1="574" y1="130" x2="602" y2="130" stroke="#3b82f6" stroke-width="2.8"/>
+      <text x="610" y="134" fill="#1d4ed8">音频 c=0.810</text>
+      <line x1="574" y1="152" x2="602" y2="152" stroke="#10b981" stroke-width="2.8"/>
+      <text x="610" y="156" fill="#047857">外观 c=0.388</text>
+    </g>
+    <text x="440" y="335" text-anchor="middle" font-size="11" fill="#a49bc6">虚线 = 半衰期位置。外观分支 0.73 步就衰减一半,视频 1.8 步,音频 3.3 步。</text>
+  </svg>
+  <p class="svgcap" style="text-align:center"><b>SVG ②|自绘</b> —— 权重曲线由 \(c^{k}\) 直接绘制,半衰期由 \(\ln(1/2)/\ln c\) 算得。</p>
+  </div>
+
+  <h3>3.4 为什么音频不门控、视频要门控?</h3>
+  <p>论文给的理由很干脆:<b>音素的快速变化是"预期之内"的,而不是身份漂移的证据</b>。</p>
+  <p>用我们的份额公式看就很清楚:音频的观测份额 47.4% 已经接近一半,衰减最慢(3.29 步)。如果再给它加门控,那么正常的语速变化、音调起伏会被误判为"不可靠"而被压制——结果是声音变得呆板。所以音频只做"系绳"(tethered):锚点固定住音色,内容自由更新。</p>
+  <p>视频则相反:姿态、镜头、场景本来就应该变,但<b>结构</b>不该变。所以门控不能门住"变化",只能门住"结构不一致的变化"——这就是第 4 章那个余弦相似度门控的来历。</p>
+
+  <h3>3.5 公式的局限</h3>
+  <div class="warn"><span class="btag">批判</span>
+    <h4>这个估计器没有"不确定性"</h4>
+    <p>式 (4) 是一个<b>指数加权移动平均</b>(EWMA),它在统计上等价于一个固定遗忘因子的在线均值。它的已知问题:</p>
+    <p>(1) <b>无置信区间</b>。它给出一个点估计 \(m_t\),但不会告诉你"这个估计有多可靠"。当观测突然变得一致地坏(而不是偶尔坏),门控也无法察觉——因为门控只看单块与锚点的相似度,不看<b>连续多块的一致性趋势</b>。</p>
+    <p>(2) <b>稳态份额固定</b>。不管数据多稳定,锚点永远占 62.5%(视频)。一个更聪明的估计器应该在"观测很可信"时降低锚点权重,在"观测很可疑"时提高——这正对应第 11 章 RQ1 提的自适应 λ。</p>
+  </div>
+
+    <h3>本章自测</h3>
+  <details><summary>Q3.1&nbsp; 若 \(\beta=0\),更新式变成什么?</summary>
+    <div class="ans">\(m_t=\mathcal E(m_{t-1},a,s;0,\lambda)=(1-\lambda)m_{t-1}+\lambda a\)。观测 \(s\) 完全被忽略,记忆只向锚点指数收敛。这说明 \(\beta\) 是"是否吸收新信息"的总开关。</div></details>
+  <details><summary>Q3.2&nbsp; 视频分支 c=0.68,要几步衰减到 1%?</summary>
+    <div class="ans">解 \(0.68^k=0.01\):\(k=\ln(0.01)/\ln(0.68)\approx 11.9\) 步。即约 12 步后,早期的单次观测几乎不再有影响。</div></details>
+  <details><summary>Q3.3&nbsp; 为什么锚点份额在稳态时不随时长变化?</summary>
+    <div class="ans">因为锚点每次更新都重新注入,其权重按 \(\lambda c^k\) 累加,而观测也按 \(b c^k\) 累加。两者的比值与 \(k\) 无关,所以稳态份额是常数 \(\lambda/(\lambda+\beta-\lambda\beta)\)。</div></details>
+  <details><summary>Q3.4&nbsp; 如果 \(\lambda=1\),会发生什么?</summary>
+    <div class="ans">\(\mathcal E=a\),记忆恒等于锚点,完全不更新。视频会完全静止(姿态也不再变化)。这从公式上说明 \(\lambda\) 不能取 1——必须留出观测的空间。</div></details>
+
+<div class="chnav">
+    <a href="#ch2"><span class="lab">上一章</span><span class="ttl">← 系统解剖</span></a>
+    <a class="next" href="#ch4"><span class="lab">下一章</span><span class="ttl">置信门控 →</span></a>
+  </div>
+</section>
+
+<!-- ============ CH4 ============ -->
+<section id="ch4">
+  <div class="chhead"><div class="chnum">04</div><div>
+    <h2>数学核心 II:置信门控</h2>
+    <div class="sub">把"这一块看起来还像她吗"变成一个可微的开关</div>
+  </div></div>
+
+  <p class="lead">式 (4) 有一个隐含假设:所有观测 \(s_t\) 同等可信。但真实情况是——有些块生成得很好,有些块已经跑偏了。门控就是给每个观测打一个"可信度分"。</p>
+
+  <h3>4.1 度量:余弦相似度</h3>
+  <div class="eq">$$\rho_t \;=\; \frac{1}{B}\sum_{b=1}^{B}\cos\!\Big(\mathrm{vec}\big(s^v_{t,b}\big),\ \mathrm{vec}\big(a^v_b\big)\Big)$$</div>
+  <div class="tw"><table>
+    <tr><th>符号</th><th>含义</th><th>为什么这样设计</th></tr>
+    <tr><td>\(\mathrm{vec}(\cdot)\)</td><td>把 token 维和通道维摊平成一个向量</td><td>要算整体相似度,必须先变成一个向量</td></tr>
+    <tr><td>\(\cos(u,v)=\dfrac{u^\top v}{\|u\|\,\|v\|}\)</td><td>夹角余弦,只看方向不看长度</td><td><b>关键</b>:归一化后 \(s^v_t\) 已做过空间标准化,所以余弦对"通道整体偏移"不敏感</td></tr>
+    <tr><td>\(B\)</td><td>mini-batch 内样本数</td><td>论文明确说 \(\rho_t\) 在一个 batch 内平均——这是一个<b>batch 级</b>统计量,不是逐样本的</td></tr>
+  </table></div>
+
+  <div class="note"><span class="btag">为什么用余弦,而不用欧氏距离</span>
+    <p>论文的解释只有一句:"because \(s^v_t\) is spatially normalized, its agreement with the visual anchor is insensitive to first-order channel shifts"。翻译过来:</p>
+    <p>因为 \(s^v_t\) 做过 \( \mathrm{Norm}_{HW}\)(每个通道在空间维上标准化),<b>一阶的通道偏移已经被除掉</b>。此时剩下的差异主要表现为"空间结构的形状"是否一致——而这正好由<b>方向</b>刻画,与向量的长度(整体能量)无关。余弦相似度就是"只看方向"的度量。</p>
+  </div>
+
+  <h3>4.2 从相似度到门:一个 sigmoid</h3>
+  <div class="eq">$$g_t \;=\; g_{\min} + \big(1-g_{\min}\big)\,\sigma\!\left(\frac{\rho_t-\tau}{T_g}\right),\qquad \sigma(x)=\frac{1}{1+e^{-x}}$$</div>
+  <div class="tw"><table>
+    <tr><th>参数</th><th>论文取值</th><th>作用</th></tr>
+    <tr><td>\(\tau\)(阈值)</td><td>0.05</td><td>相似度低于这个值,门开始关闭</td></tr>
+    <tr><td>\(T_g\)(温度)</td><td>0.10</td><td>过渡带的宽度;越小越"硬"</td></tr>
+    <tr><td>\(g_{\min}\)(地板)</td><td>0.10</td><td>门的最小值,<b>防止完全冻结</b></td></tr>
+  </table></div>
+
+  <div class="deriv">
+    <div class="dtitle">命题 4.1 · 门控的三条性质</div>
+    <div class="step"><div class="sn">①</div><div class="sc">
+      <p style="margin:0"><b>值域。</b>因为 \(\sigma\in(0,1)\),所以 \(g_t\in(g_{\min},\,1)\)。</p>
+      <div class="why">门永远不会真的到 0 或 1——它是一个"软"开关。这很重要:如果门能到 0,一旦误判就会永久冻结记忆,再也无法恢复。论文明确说 "The nonzero gate floor avoids irreversible freezing when valid pose or scene changes reduce similarity"。</div>
+    </div></div>
+    <div class="step"><div class="sn">②</div><div class="sc">
+      <p style="margin:0"><b>中点。</b>当 \(\rho_t=\tau\) 时,\(\sigma(0)=1/2\),于是</p>
+      <div class="eq" style="margin:10px 0">$$g_t = g_{\min} + \frac{1-g_{\min}}{2} = \frac{1+g_{\min}}{2} = \frac{1+0.10}{2}=0.55$$</div>
+      <div class="why">即:相似度<b>正好等于阈值</b>时,门开一半多一点。</div>
+    </div></div>
+    <div class="step"><div class="sn">③</div><div class="sc">
+      <p style="margin:0"><b>两个极限。</b>\(\rho_t\to+\infty\) 时 \(g_t\to1\);\(\rho_t\to-\infty\) 时 \(g_t\to g_{\min}=0.10\)。</p>
+      <div class="why">所以门的动态范围是 \([0.10,\ 1)\)——最多把更新率压到 1/10,不会归零。</div>
+    </div></div>
+  </div>
+
+  <h4>手算几个值(取 τ=0.05, T_g=0.10, g_min=0.10)</h4>
+  <div class="tw"><table>
+    <caption>注意 \(\rho\) 只需要从 −0.15 变到 +0.35,门就从 0.21 变到 0.96——一个很窄的相似度区间就覆盖了几乎全部门控范围。这说明作者把 sigmoid 的中心对准了实际分布的中段。</caption>
+    <tr><th>相似度 \(\rho_t\)</th><th>\((\rho-\tau)/T_g\)</th><th>\(\sigma\)</th><th>门 \(g_t\)</th><th>有效更新率 \(\beta_v g_t\)</th></tr>
+    <tr><td>−0.15</td><td>−2.0</td><td>0.119</td><td>0.207</td><td>0.0311</td></tr>
+    <tr><td>−0.05</td><td>−1.0</td><td>0.269</td><td>0.342</td><td>0.0513</td></tr>
+    <tr><td>0.00</td><td>−0.5</td><td>0.378</td><td>0.440</td><td>0.0660</td></tr>
+    <tr><td><b>0.05(=τ)</b></td><td>0</td><td>0.500</td><td><b>0.550</b></td><td>0.0825</td></tr>
+    <tr><td>0.10</td><td>+0.5</td><td>0.622</td><td>0.660</td><td>0.0990</td></tr>
+    <tr><td>0.15</td><td>+1.0</td><td>0.731</td><td>0.758</td><td>0.1137</td></tr>
+    <tr><td>0.25</td><td>+2.0</td><td>0.881</td><td>0.893</td><td>0.1339</td></tr>
+    <tr><td>0.35</td><td>+3.0</td><td>0.953</td><td>0.957</td><td>0.1436</td></tr>
+  </table></div>
+
+  <h3>4.3 门控如何改变稳态份额(本文的关键推导)</h3>
+  <p>论文把门控写进更新率:\(m^v_t=\mathcal E(m^v_{t-1},a^v,s^v_t;\ \beta_v g_t,\ \lambda_v)\)。也就是说<b>\(\beta\) 被门控缩放了</b>,而 \(\lambda\) 不变。把 \(\beta_{\text{eff}}=\beta_v g_t\) 代回第 3 章的份额公式:</p>
+  <div class="eq">$$\text{锚点份额}(g)\;=\;\frac{\lambda_v}{\lambda_v+\beta_v g-\lambda_v\beta_v g}$$</div>
+
+  <div class="deriv">
+    <div class="dtitle">推导 4.1 · 门关小 ⇒ 锚点份额上升 ⇒ 记忆"自动锁死"</div>
+    <div class="step"><div class="sn">①</div><div class="sc">
+      <p style="margin:0">记 \(D(g)=\lambda+\beta g-\lambda\beta g\)。对 \(g\) 求导:</p>
+      <div class="eq" style="margin:10px 0">$$\frac{dD}{dg}=\beta(1-\lambda) \gt 0$$</div>
+      <div class="why">只要 \(0 \lt \beta\) 且 \(\lambda \lt 1\),分母随 \(g\) 单调递增。</div>
+    </div></div>
+    <div class="step"><div class="sn">②</div><div class="sc">
+      <p style="margin:0">锚点份额 \(=\lambda/D(g)\),分子是常数、分母递增,所以份额随 \(g\) <b>单调递减</b>。</p>
+      <div class="why">结论:门关得越小(\(g\) 越小)⇒ 观测的话语权越小 ⇒ <b>锚点的相对分量越大</b>。这不是额外设计,而是"缩放 β"这个操作的直接数学后果。</div>
+    </div></div>
+    <div class="step"><div class="sn">③</div><div class="sc">
+      <p style="margin:0">代入数值(\(\beta_v=0.15,\lambda_v=0.20\)):</p>
+      <div class="tw" style="margin:10px 0"><table>
+        <tr><th>情形</th><th>\(g_t\)</th><th>\(\beta_{\text{eff}}\)</th><th>锚点份额</th></tr>
+        <tr><td>结构高度一致(\(\rho=0.35\))</td><td>0.957</td><td>0.144</td><td><b>63.5%</b></td></tr>
+        <tr><td>刚好达到阈值(\(\rho=0.05\))</td><td>0.550</td><td>0.083</td><td>75.2%</td></tr>
+        <tr><td>结构明显不符(\(\rho=-0.15\))</td><td>0.207</td><td>0.031</td><td><b>88.9%</b></td></tr>
+      </table></div>
+    </div></div>
+    <div class="step"><div class="sn">④</div><div class="sc">
+      <p style="margin:0"><b>读这个结果。</b>当生成块与锚点"不像"时,系统不会硬性拒绝(那会冻结),而是把锚点的相对权重从 63.5% 提到 88.9%——<b>平滑地滑向"更信锚点"</b>。这正是"软拒绝"的正确形态:既不接受坏证据,也不失去适应能力。</p>
+    </div></div>
+  </div>
+
+  <div class="svgwrap">
+  <svg viewBox="0 0 880 360" role="img" aria-label="门控函数与锚点份额的联动曲线">
+    <rect width="880" height="360" fill="#fdfbff" rx="16"/>
+    <text x="440" y="28" text-anchor="middle" font-size="14" font-weight="700" fill="#1a1730" font-family="Noto Serif SC,serif">门控(左轴)与由此产生的锚点份额(右轴)——一条曲线的两个面孔</text>
+    <!-- left axis -->
+    <g>
+      <line x1="80" y1="290" x2="790" y2="290" stroke="#d8cfea" stroke-width="2"/>
+      <line x1="80" y1="56" x2="80" y2="290" stroke="#d8cfea" stroke-width="2"/>
+      <line x1="790" y1="56" x2="790" y2="290" stroke="#c7b8e6" stroke-width="2"/>
+      <g font-size="10.5" fill="#76738c" text-anchor="end">
+        <text x="70" y="294">0</text><text x="70" y="236">0.25</text><text x="70" y="178">0.5</text><text x="70" y="120">0.75</text><text x="70" y="62">1.0</text>
+      </g>
+      <g font-size="10.5" fill="#9f1239" text-anchor="start">
+        <text x="800" y="294">50%</text><text x="800" y="236">60%</text><text x="800" y="178">70%</text><text x="800" y="120">80%</text><text x="800" y="62">90%</text>
+      </g>
+      <text x="44" y="175" font-size="10.5" fill="#4c4b5e" transform="rotate(-90 44 175)" text-anchor="middle">门 g_t</text>
+      <text x="834" y="175" font-size="10.5" fill="#9f1239" transform="rotate(90 834 175)" text-anchor="middle">锚点份额</text>
+    </g>
+    <!-- x axis: rho -0.30 .. +0.45 -->
+    <g font-size="10.5" fill="#76738c" text-anchor="middle">
+      <text x="80" y="310">−0.30</text><text x="256" y="310">−0.10</text><text x="432" y="310">+0.10</text>
+      <text x="608" y="310">+0.30</text><text x="784" y="310">+0.50</text>
+      <text x="435" y="332" fill="#4c4b5e">相似度 ρ_t</text>
+    </g>
+    <!-- g curve: x = 80 + (rho+0.30)/0.80*710 ; y = 290 - g*234 -->
+    <!-- compute a smooth path via many points -->
+    <path id="gpath" fill="none" stroke="#a855f7" stroke-width="3"/>
+    <path id="sharepath" fill="none" stroke="#f43f5e" stroke-width="2.6" stroke-dasharray="7 4"/>
+    <!-- markers at rho = tau -->
+    <line x1="391" y1="56" x2="391" y2="290" stroke="#c4b5fc" stroke-dasharray="4 4" stroke-width="1.2"/>
+    <text x="391" y="50" font-size="10" fill="#7c3aed" text-anchor="middle">ρ = τ = 0.05</text>
+    <!-- legend -->
+    <g font-size="11.5" font-family="Noto Sans SC,sans-serif">
+      <rect x="100" y="66" width="216" height="62" rx="10" fill="#fff" stroke="#e9e4f5"/>
+      <line x1="114" y1="86" x2="142" y2="86" stroke="#a855f7" stroke-width="3"/>
+      <text x="150" y="90" fill="#6d28d9">门控 g_t = g_min+(1−g_min)σ((ρ−τ)/T_g)</text>
+      <line x1="114" y1="110" x2="142" y2="110" stroke="#f43f5e" stroke-width="2.6" stroke-dasharray="7 4"/>
+      <text x="150" y="114" fill="#9f1239">锚点稳态份额 λ/(λ+βg−λβg)</text>
+    </g>
+    <text x="440" y="352" text-anchor="middle" font-size="10.5" fill="#a49bc6">ρ 越小 → 门越小 → 有效更新率越低 → 锚点份额越高。两条曲线始终反向。</text>
+  </svg>
+  <p class="svgcap" style="text-align:center"><b>SVG ③|自绘</b> —— 左轴紫线是门控本身,右轴红虚线是它通过份额公式"翻译"出来的锚点权重。两者严格反向,这就是"软拒绝"的数学形态。</p>
+  <script>
+  (function(){
+    const chart = document.getElementById('gpath');
+    if(!chart) return;
+    const gmin=0.10, tau=0.05, Tg=0.10, beta=0.15, lam=0.20;
+    const X = rho => 80 + (rho+0.30)/0.80*710;
+    const Yg = g => 290 - g*234;
+    const Ys = s => 290 - (s-0.50)/0.40*234;
+    let dg='', ds='';
+    for(let i=0;i<=200;i++){
+      const rho=-0.30+0.80*i/200;
+      const g = gmin+(1-gmin)*(1/(1+Math.exp(-(rho-tau)/Tg)));
+      const D = lam + beta*g - lam*beta*g;
+      const share = lam/D;
+      dg += (i?'L':'M') + X(rho).toFixed(1) + ' ' + Yg(g).toFixed(1);
+      ds += (i?'L':'M') + X(rho).toFixed(1) + ' ' + Ys(share).toFixed(1);
+    }
+    document.getElementById('gpath').setAttribute('d', dg);
+    document.getElementById('sharepath').setAttribute('d', ds);
+  })();
+  </script>
+  </div>
+
+  <h3>4.4 外观分支:门控 + 硬拒绝</h3>
+  <p>外观(\(\kappa_t,\pi_t\))用的是"门控 + 硬拒绝"双层机制。论文的原话是:</p>
+  <p class="small" style="border-left:3px solid var(--lav-300);padding-left:14px">"We therefore apply the same soft confidence gate to κ_t and π_t, together with a hard rejection rule based on their normalized deviation from anchor statistics. In-range observations support gradual appearance adaptation, whereas outliers leave the previous appearance memory unchanged."</p>
+  <p>换句话说:</p>
+  <ul>
+    <li><b>软门控</b>:和视频一样,\(\beta_c g_t\) 缩放更新率;</li>
+    <li><b>硬拒绝</b>:如果观测相对锚点统计的归一化偏差超出某个范围,<b>直接不更新</b>(保留上一轮)。</li>
+  </ul>
+  <p>为什么要多一层硬拒绝?因为颜色误差有一个恶劣性质:<b>它是累积的</b>。一旦颜色开始偏,下一块会把"偏了的颜色"当正常,偏差继续累积——反馈回路。软门控只能减速,不能阻断;硬拒绝是一个绝对上限。</p>
+  <div class="insight"><span class="btag">深度洞察</span>
+    <h4>这实际上是"鲁棒的在线估计":软门控 = Huber 权重,硬拒绝 = 内点检验</h4>
+    <p>在鲁棒统计里,处理离群观测有两条经典路线:(a) <b>M-估计</b>,用一个有界的权重函数(如 Huber)给离群点降权;(b) <b>内点/外点判别</b>,先把明显的外点剔除再估计。</p>
+    <p>TaoMate 的外观分支<b>两条都用了</b>:sigmoid 门控提供平滑降权(类似 Huber),归一化偏差的硬阈值提供外点剔除(类似 RANSAC 的内点判定)。这在工程上是合理的组合,但论文没有把它上升到"鲁棒估计"的语言,也没有给出阈值的选择依据。<b>这是一个可以深挖的理论空白</b>——见第 11 章 RQ2。</p>
+  </div>
+
+  <h3>4.5 一个被忽略的细节:ρ 是 batch 级的</h3>
+  <p>论文式 (5) 里,\(\rho_t=\frac{1}{B}\sum_{b}\cos(\cdot)\) 明确对 batch 内 \(b\) 求和平均。这意味着:</p>
+  <div class="warn"><span class="btag">需要注意</span>
+    <h4>推理时的 batch 是什么?</h4>
+    <p>训练时 batch 里有多条独立样本,取平均是一种"共享统计量"的做法——相当于假设一个 batch 内的主体相似度是同一水平。但<b>推理时生成一条视频,batch size 通常是 1</b>。此时 \(\rho_t\) 就是单个样本的余弦值,与训练时的"跨样本平均"语义不同。</p>
+    <p>论文没有讨论这个 train/test 语义差异。合理的猜测是:作者在推理时用的是单样本的余弦(即 \(B=1\)),那么训练时的 batch 平均只是起到了<b>降低方差、稳定门控信号</b>的作用。但如果 batch 内的主体彼此不同(比如混了不同人的数据),这个平均会抹掉个体差异——这是一个潜在的隐患。<b>这是第 11 章 RQ3 的问题来源。</b></p>
+  </div>
+
+    <h3>本章自测</h3>
+  <details><summary>Q4.1&nbsp; 门控为什么必须有地板 \(g_{\min}\)?</summary>
+    <div class="ans">因为门控依赖"与锚点的相似度",而合法的姿态/场景变化会降低相似度。若门可为 0,一次合法的大幅变化就会让记忆永久冻结。地板保证"仍有 10% 的更新能力",可以慢慢爬出来。</div></details>
+  <details><summary>Q4.2&nbsp; \(\rho_t\) 落在什么范围时,门控"半开"?</summary>
+    <div class="ans">\(\rho_t=\tau=0.05\) 时 \(g=0.55\)(半开多一点)。所以门控的决策边界就是阈值 \(\tau\),而 \(T_g\) 决定边界附近的过渡陡峭程度。</div></details>
+  <details><summary>Q4.3&nbsp; 若把 \(T_g\) 调到很小(如 0.001),会怎样?</summary>
+    <div class="ans">门控退化为硬阶跃:相似度略低于阈值就直接压到地板。这会让更新对噪声极敏感,并失去"软拒绝"的平滑性。论文选 0.10 是一个折中。</div></details>
+  <details><summary>Q4.4&nbsp; 为什么外观分支要额外加"硬拒绝",而视频分支不用?</summary>
+    <div class="ans">因为颜色误差是累积性的:一旦偏了,下一块会以偏了的颜色为参考继续偏。外观缺少像内容记忆那样的纠偏通道,所以需要一个绝对上限来切断反馈回路。</div></details>
+
+<div class="chnav">
+    <a href="#ch3"><span class="lab">上一章</span><span class="ttl">← 锚约束内存演化</span></a>
+    <a class="next" href="#ch5"><span class="lab">下一章</span><span class="ttl">结构匹配条件化 →</span></a>
+  </div>
+</section>
+<!-- ============ CH5 ============ -->
+<section id="ch5">
+  <div class="chhead"><div class="chnum">05</div><div>
+    <h2>结构匹配的条件化</h2>
+    <div class="sub">为什么内容走注意力、外观走 FiLM——而不是把记忆拼进序列</div>
+  </div></div>
+
+  <p class="lead">有了记忆,下一个问题是怎么把它喂给模型。最直觉的做法是"拼到序列后面"。论文明确拒绝了这条路,并且给了两个理由。这一章解释这两个理由的数学含义。</p>
+
+  <h3>5.1 两条通路的公式</h3>
+  <div class="eq">$$\tilde h^m_\ell \;=\; h^m_\ell + \mathrm{MemAttn}^m_\ell\Big(\mathrm{RMSNorm}(h^m_\ell),\ u^m_{t-1}\Big)$$</div>
+  <div class="eq">$$\hat h^v_\ell \;=\; \tilde h^v_\ell + \gamma_\ell(c_{t-1})\odot\mathrm{RMSNorm}(\tilde h^v_\ell) + b_\ell(c_{t-1})$$</div>
+  <div class="tw"><table>
+    <tr><th>符号</th><th>含义</th><th>维度/来源</th></tr>
+    <tr><td>\(m\in\{v,a\}\)</td><td>模态:视频 / 音频</td><td>—</td></tr>
+    <tr><td>\(h^m_\ell\)</td><td>第 \(\ell\) 层的隐藏状态</td><td>主干 DiT 的输出</td></tr>
+    <tr><td>\(r^v_{t-1}=[a^v;m^v_{t-1}]\)</td><td>视频记忆:锚点与内容<b>拼接</b></td><td>48 tokens(论文)</td></tr>
+    <tr><td>\(r^a_{t-1}=m^a_{t-1}\)</td><td>音频记忆:只有内容</td><td>64 tokens</td></tr>
+    <tr><td>\(u^m_{t-1}=\mathcal E_m(r^m_{t-1})\)</td><td>记忆编码后的 K/V</td><td>固定张数</td></tr>
+    <tr><td>\(c_{t-1}\)</td><td>动态 + 锚点通道统计拼接</td><td>FiLM 的条件输入</td></tr>
+    <tr><td>\(\gamma_\ell,b_\ell\)</td><td>从 \(c_{t-1}\) 生成缩放与偏移</td><td>每层一对</td></tr>
+  </table></div>
+
+  <h3>5.2 理由一:位置语义不能被污染</h3>
+  <p>论文的原话:"Directly concatenating all memory components with the active sequence would blur the distinction between temporally ordered local context and position-free long-range evidence."</p>
+  <div class="deriv">
+    <div class="dtitle">为什么拼接会"模糊"位置语义</div>
+    <div class="step"><div class="sn">①</div><div class="sc">
+      <p style="margin:0">活动上下文 \(C_{t-1}\) 里的 token 都带 <b>RoPE 位置</b>。位置编码的作用是告诉注意力"这两个 token 相隔多远"。</p>
+      <div class="why">RoPE 通过旋转把相对位置编码进 query/key 的内积,使 \(\langle q_i,k_j\rangle\) 依赖 \(i-j\)。</div>
+    </div></div>
+    <div class="step"><div class="sn">②</div><div class="sc">
+      <p style="margin:0">记忆 \(M_{t-1}\) 是<b>定长、无位置</b>的压缩表示。它代表"很久以前的证据",没有"第几帧"的概念。</p>
+      <div class="why">这也正是它能做到"成本与时长无关"的原因:一旦有位置,它的规模就随时长增长了。</div>
+    </div></div>
+    <div class="step"><div class="sn">③</div><div class="sc">
+      <p style="margin:0">如果把两者拼进同一序列,模型就必须回答一个无法回答的问题:<b>记忆 token 的位置该填什么?</b></p>
+      <div class="eq" style="margin:10px 0">$$\text{填 }0 \Rightarrow \text{它离最近帧"很近"};\quad \text{填 }t \Rightarrow \text{它离最近帧"很远"}$$</div>
+      <div class="why">两种都会误导:前者让模型以为旧证据是"刚才的",后者让模型把定长记忆当成"当前位置的 token",破坏注意力几何。而它实际上是<b>跨时间的摘要</b>,不该有位置。</div>
+    </div></div>
+    <div class="step"><div class="sn">④</div><div class="sc">
+      <p style="margin:0">所以正确做法是<b>旁路</b>(side attention):记忆作为额外的 K/V,通过一个独立的注意力操作接入,<b>不进入位置序列</b>。这样它的语义保持"无位置的长程证据",而序列里的 token 保持"有位置的局部上下文"。</p>
+    </div></div>
+  </div>
+
+  <h3>5.3 理由二:两种信息需要不同的"作用范围"</h3>
+  <p>论文的第二句:"It would also force token-valued content and global appearance statistics through the same retrieval mechanism, despite their different roles in generation."</p>
+  <div class="tw"><table>
+    <caption>这是本章的核心洞察:不是"两种信息",而是"两种作用范围"。</caption>
+    <tr><th></th><th>内容记忆 \(m^v,m^a\)</th><th>外观统计 \(\kappa,\pi\)</th></tr>
+    <tr><td>信息形态</td><td><b>token 序列</b>(48/64 个)</td><td><b>全局向量</b>(每通道一个数)</td></tr>
+    <tr><td>正确的作用方式</td><td><b>选择性检索</b>:不同的 query 需要不同的历史片段</td><td><b>一致调制</b>:所有 token 该被同样地"染色"</td></tr>
+    <tr><td>对应机制</td><td>注意力(带 query,可选择性)</td><td>FiLM(无 query,对所有通道统一仿射)</td></tr>
+    <tr><td>如果搞反会怎样</td><td>用 FiLM:一个全局向量强行压到所有 token,丢失空间选择性</td><td>用注意力:每个 token 独立决定"要不要这个颜色",导致颜色不一致、局部斑块</td></tr>
+  </table></div>
+
+  <div class="insight"><span class="btag">深度洞察</span>
+    <h4>FiLM 的本质:一个"全局的、无条件的"仿射变换</h4>
+    <p>FiLM(Feature-wise Linear Modulation,Perez et al. 2018)的形式是 \(\gamma\odot x+b\)。注意它<b>没有 query</b>——给定 \(c_{t-1}\),所有位置、所有通道都用同一组 \((\gamma,b)\)。</p>
+    <p>这正是"外观"该有的行为:颜色和对比度是<b>全局属性</b>,不该在画面不同区域给出不同的值。而注意力有 query,天然是"每个位置自己决定看什么"——用在外观上会产生"脸是暖色、背景是冷色"这种不一致。</p>
+    <p>反过来,内容(姿态、场景布局)是<b>空间选择性的</b>:当前这个 token 是"手",它该看的记忆和"背景"该看的记忆不同。这必须用注意力。<b>所以"结构匹配"这个词是准确的:信息的结构决定了它该走哪条通路。</b></p>
+  </div>
+
+  <div class="svgwrap">
+  <svg viewBox="0 0 880 330" role="img" aria-label="两条条件化通路的对比">
+    <rect width="880" height="330" fill="#fdfbff" rx="16"/>
+    <text x="440" y="28" text-anchor="middle" font-size="14" font-weight="700" fill="#1a1730" font-family="Noto Serif SC,serif">两条通路:选择性检索 vs 全局调制</text>
+
+    <!-- left: attention -->
+    <g>
+      <rect x="28" y="46" width="400" height="252" rx="14" fill="#f5f3ff" stroke="#ddd6fe"/>
+      <text x="228" y="70" text-anchor="middle" font-size="12.5" font-weight="700" fill="#5b21b6">① 内容 → MemAttn(有 query)</text>
+      <!-- query tokens -->
+      <g>
+        <rect x="56" y="92" width="34" height="60" rx="7" fill="#c4b5fd"/><text x="73" y="127" text-anchor="middle" font-size="10" fill="#3b0764">q₁</text>
+        <rect x="98" y="92" width="34" height="60" rx="7" fill="#c4b5fd"/><text x="115" y="127" text-anchor="middle" font-size="10" fill="#3b0764">q₂</text>
+        <rect x="140" y="92" width="34" height="60" rx="7" fill="#c4b5fd"/><text x="157" y="127" text-anchor="middle" font-size="10" fill="#3b0764">q₃</text>
+      </g>
+      <text x="115" y="86" text-anchor="middle" font-size="10" fill="#6d28d9">当前 token</text>
+      <!-- attention weight bars -->
+      <g font-size="9.5" fill="#7c3aed">
+        <text x="196" y="100">0.7</text><rect x="214" y="90" width="60" height="12" rx="6" fill="#8b5cf6"/>
+        <text x="196" y="124">0.2</text><rect x="214" y="114" width="18" height="12" rx="6" fill="#a78bfa"/>
+        <text x="196" y="148">0.1</text><rect x="214" y="138" width="9" height="12" rx="6" fill="#c4b5fd"/>
+      </g>
+      <!-- memory kv -->
+      <g>
+        <rect x="296" y="84" width="110" height="76" rx="10" fill="#ede9fe" stroke="#a78bfa"/>
+        <text x="351" y="102" text-anchor="middle" font-size="10" fill="#5b21b6">记忆 K/V</text>
+        <text x="351" y="120" text-anchor="middle" font-size="9" fill="#7c3aed">48 / 64 tokens</text>
+        <text x="351" y="138" text-anchor="middle" font-size="9" fill="#7c3aed">无位置</text>
+        <text x="351" y="154" text-anchor="middle" font-size="9" fill="#7c3aed">定长</text>
+      </g>
+      <text x="228" y="196" text-anchor="middle" font-size="10.5" fill="#5b21b6">不同位置可以看不同的历史片段</text>
+      <text x="228" y="220" text-anchor="middle" font-size="10.5" fill="#5b21b6">⇒ 支持<b>空间选择性</b></text>
+      <text x="228" y="252" text-anchor="middle" font-size="11" font-weight="700" fill="#6d28d9">适合:姿态 · 场景布局 · 音素上下文</text>
+      <text x="228" y="278" text-anchor="middle" font-size="10" fill="#7c3aed">副作用:若用于外观 ⇒ 局部色块不一致</text>
+    </g>
+
+    <!-- right: FiLM -->
+    <g>
+      <rect x="452" y="46" width="400" height="252" rx="14" fill="#fff1f2" stroke="#fecdd3"/>
+      <text x="652" y="70" text-anchor="middle" font-size="12.5" font-weight="700" fill="#9f1239">② 外观 → FiLM(无 query)</text>
+      <!-- stats vector -->
+      <g>
+        <rect x="480" y="88" width="88" height="72" rx="10" fill="#ffe4e6" stroke="#fda4af"/>
+        <text x="524" y="106" text-anchor="middle" font-size="10" fill="#9f1239">c_{t−1}</text>
+        <text x="524" y="124" text-anchor="middle" font-size="9" fill="#be123c">κ_t + a^v 统计</text>
+        <text x="524" y="142" text-anchor="middle" font-size="9" fill="#be123c">(全局向量)</text>
+      </g>
+      <path d="M568 124 L598 124" stroke="#f43f5e" stroke-width="2" marker-end="url(#arF)"/>
+      <defs><marker id="arF" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 z" fill="#f43f5e"/></marker></defs>
+      <g>
+        <rect x="602" y="100" width="70" height="46" rx="9" fill="#fecdd3"/>
+        <text x="637" y="120" text-anchor="middle" font-size="10" fill="#9f1239">γ, b</text>
+        <text x="637" y="136" text-anchor="middle" font-size="8.5" fill="#be123c">每通道一对</text>
+      </g>
+      <path d="M672 124 L700 124" stroke="#f43f5e" stroke-width="2" marker-end="url(#arF)"/>
+      <!-- all tokens get same gamma -->
+      <g>
+        <rect x="704" y="88" width="30" height="30" rx="6" fill="#fda4af" opacity=".85"/>
+        <rect x="704" y="126" width="30" height="30" rx="6" fill="#fda4af" opacity=".85"/>
+        <rect x="740" y="88" width="30" height="30" rx="6" fill="#fda4af" opacity=".85"/>
+        <rect x="740" y="126" width="30" height="30" rx="6" fill="#fda4af" opacity=".85"/>
+        <rect x="776" y="88" width="30" height="30" rx="6" fill="#fda4af" opacity=".85"/>
+        <rect x="776" y="126" width="30" height="30" rx="6" fill="#fda4af" opacity=".85"/>
+      </g>
+      <text x="752" y="176" text-anchor="middle" font-size="9.5" fill="#be123c">所有 token 同一组 γ,b</text>
+      <text x="652" y="200" text-anchor="middle" font-size="10.5" fill="#9f1239">没有任何位置能"自己选择"</text>
+      <text x="652" y="222" text-anchor="middle" font-size="10.5" fill="#9f1239">⇒ 强制<b>全局一致</b></text>
+      <text x="652" y="252" text-anchor="middle" font-size="11" font-weight="700" fill="#be123c">适合:肤色 · 对比度 · 色调 · 光照</text>
+      <text x="652" y="278" text-anchor="middle" font-size="10" fill="#9f1239">副作用:若用于内容 ⇒ 丢失空间选择性</text>
+    </g>
+  </svg>
+  <p class="svgcap" style="text-align:center"><b>SVG ④|自绘</b> —— 同一个"记忆",因为信息结构不同,必须走两条结构不同的通路。这是"结构匹配"的字面含义。</p>
+  </div>
+
+  <h3>5.4 初始化成恒等映射的技巧</h3>
+  <p>论文提到:"Both pathways are residual and initialized as identity mappings."</p>
+  <div class="deriv">
+    <div class="dtitle">为什么"初始化为恒等"很重要</div>
+    <div class="step"><div class="sn">①</div><div class="sc">
+      <p style="margin:0">两条通路都是残差形式。以 FiLM 为例:</p>
+      <div class="eq" style="margin:10px 0">$$\hat h = \tilde h + \gamma(c)\odot\mathrm{RMSNorm}(\tilde h)+b(c)$$</div>
+    </div></div>
+    <div class="step"><div class="sn">②</div><div class="sc">
+      <p style="margin:0">如果初始化使 \(\gamma\equiv0\)、\(b\equiv0\),则 \(\hat h=\tilde h\)——<b>整个调制分支在训练开始时是完全无效的</b>。</p>
+    </div></div>
+    <div class="step"><div class="sn">③</div><div class="sc">
+      <p style="margin:0">这意味着:起点就是"没有 FiLM 的原始模型",而 FiLM 的参数从零开始逐渐学会"该加多少"。梯度:</p>
+      <div class="eq" style="margin:10px 0">$$\frac{\partial\mathcal L}{\partial\gamma}=\frac{\partial\mathcal L}{\partial\hat h}\odot\mathrm{RMSNorm}(\tilde h)$$</div>
+      <div class="why">只要 \(\partial\mathcal L/\partial\hat h\neq0\),\(\gamma\) 的梯度就非零,就会开始偏离 0。所以它"能学会",只是从"不干扰"开始。</div>
+    </div></div>
+    <div class="step"><div class="sn">④</div><div class="sc">
+      <p style="margin:0"><b>好处。</b>在一个 22B 的预训练模型上加分支,最怕的是<b>一开始就把主干搞崩</b>。恒等初始化保证训练初期的行为与原始模型完全一致,新模块只能"锦上添花",不能"一上来就破坏"。这是把大模型做增量改造的标准做法(AdaLN-Zero 也是同一思路)。</p>
+    </div></div>
+  </div>
+
+  <h3>5.5 为什么只在 12 / 48 层插入记忆注意力</h3>
+  <p>论文说:"Residual memory attention is inserted every four transformer layers, giving 12 memory-enabled layers in the 48-layer backbone."</p>
+  <div class="tw"><table>
+    <tr><th>选择</th><th>优点</th><th>代价</th></tr>
+    <tr><td>每层都插(48 层)</td><td>最强表达</td><td>额外算力 ×4,实时性受损</td></tr>
+    <tr><td><b>每 4 层插(12 层)</b></td><td>算力可控,仍能跨层传播</td><td>中间层的信息可能丢失</td></tr>
+    <tr><td>只插一层</td><td>最省</td><td>单点瓶颈,深层的上下文无法被记忆影响</td></tr>
+  </table></div>
+  <p>这个选择的合理性在于:Transformer 的层在功能上是有分工的(浅层偏纹理/局部,深层偏语义/全局)。每 4 层插一次,相当于在<b>每个功能层级</b>都留了一个"记忆入口",而不是只在某一层。</p>
+  <div class="note"><span class="btag">但这没有被消融验证</span>
+    <p>论文的消融(Table 3)只比较了"有无记忆 / 有无 FiLM / 有无门控",<b>没有</b>比较"12 层 vs 24 层 vs 48 层"。所以"每 4 层"这个数字是一个工程直觉,不是实验结论。这是第 11 章 RQ4 的切入点。</p>
+  </div>
+
+  <div class="chnav">
+    <a href="#ch4"><span class="lab">上一章</span><span class="ttl">← 置信门控</span></a>
+    <a class="next" href="#ch6"><span class="lab">下一章</span><span class="ttl">因果上下文蒸馏 →</span></a>
+  </div>
+</section>
+
+<!-- ============ CH6 ============ -->
+<section id="ch6">
+  <div class="chhead"><div class="chnum">06</div><div>
+    <h2>因果上下文蒸馏:让模型习惯自己的错误</h2>
+    <div class="sub">暴露偏差的形式化,以及三重扰动的设计逻辑</div>
+  </div></div>
+
+  <p class="lead">记忆解决了"信息不在"的问题,但没有解决"信息不可信"的问题。这一章讲训练端怎么让模型学会在<b>自己的错误历史</b>上继续工作。</p>
+
+  <h3>6.1 暴露偏差:一个精确的定义</h3>
+  <div class="def"><span class="btag">定义 6.1 · 上下文分布差</span>
+    <p>设学生模型为 \(p_\theta\)。训练时它的条件历史来自分布 \(p_{\text{train}}(h)\),部署时的历史来自 \(p_{\text{deploy}}(h)\)。若</p>
+    <div class="eq" style="margin:10px 0">$$\mathrm{TV}\big(p_{\text{train}}(h),\,p_{\text{deploy}}(h)\big) \gt 0$$</div>
+    <p>则模型在部署时会遇到大量"训练时没见过"的条件,泛化失败。这就是暴露偏差(exposure bias)的分布形式。</p>
+  </div>
+  <p>Total Variation(TV)距离定义为 \(\mathrm{TV}(P,Q)=\sup_A|P(A)-Q(A)|\),取值在 \([0,1]\)。它是一个"最坏情形"的差异度量。</p>
+
+  <div class="deriv">
+    <div class="dtitle">推论 6.1 · 为什么误差会滚雪球</div>
+    <div class="step"><div class="sn">①</div><div class="sc">
+      <p style="margin:0">设单步预测误差为 \(\varepsilon_t\)。第 t 块的条件包含前 t−1 块的误差。</p>
+    </div></div>
+    <div class="step"><div class="sn">②</div><div class="sc">
+      <p style="margin:0">若模型的误差对条件的敏感度有上界 \(L\)(Lipschitz 常数),则</p>
+      <div class="eq" style="margin:10px 0">$$\|\varepsilon_t\| \;\le\; \varepsilon_0\;+\; L\sum_{k=1}^{t-1}\|\varepsilon_k\|$$</div>
+      <div class="why">这是误差递推的标准形式:每一步的误差 ≤ 自身噪声 + 前序误差经过敏感度放大后的贡献。</div>
+    </div></div>
+    <div class="step"><div class="sn">③</div><div class="sc">
+      <p style="margin:0">由 Grönwall 型不等式,解的上界形如</p>
+      <div class="eq" style="margin:10px 0">$$\|\varepsilon_t\| \;\lesssim\; \varepsilon_0\,(1+L)^{t}$$</div>
+      <div class="why"><b>指数增长</b>。当 \(L\) 略大于 0,100 步后就可能爆掉。这解释了为什么"只做一步蒸馏"完全不够——它只优化了 \(t=1\),没管 \(t=100\)。</div>
+    </div></div>
+    <div class="step"><div class="sn">④</div><div class="sc">
+      <p style="margin:0"><b>破解方式。</b>有两个方向:(a) 减小 \(L\)(让模型对历史误差不敏感,但会牺牲一致性);(b) <b>让训练分布覆盖部署中会出现的误差</b>,即把 \(p_{\text{train}}\) 推向 \(p_{\text{deploy}}\)。TaoMate 走的是 (b)。</p>
+    </div></div>
+  </div>
+
+  <h3>6.2 三重扰动:每个都针对一种"部署时会遇到的错"</h3>
+  <div class="tw"><table>
+    <caption>这张表是本章的核心:三重扰动不是拍脑袋的 data augmentation,每一个都对应暴露偏差的一个具体来源。</caption>
+    <tr><th>扰动</th><th>论文设置</th><th>模拟部署时的什么</th><th>数学效果</th></tr>
+    <tr><td><b>① 混合视野</b></td><td>\(H\in\{5,10\}\),概率 \(\{0.8,0.2\}\)</td><td>部署时要滚上千步,误差已累积很深</td><td>让 \(p_{\text{train}}\) 的支撑扩展到长 horizons,减小与 \(p_{\text{deploy}}\) 的 TV 距离</td></tr>
+    <tr><td><b>② 学生生成前缀</b></td><td>概率 0.1 用 detached 学生输出替换干净前缀</td><td>部署时的历史是模型自己生成的,带模型特有的偏差</td><td>让模型见到"自己的口音",而不是只见老师的</td></tr>
+    <tr><td><b>③ 非锚历史加噪</b></td><td>\(\sigma\sim\mathcal U(0,0.15)\),<b>锚点不加噪</b></td><td>部署时早期块有累积误差</td><td>不对称处理:噪声 ⇒ 不信任;锚点干净 ⇒ 保留身份信号</td></tr>
+  </table></div>
+
+  <div class="insight"><span class="btag">深度洞察</span>
+    <h4>"锚点不加噪"是全篇最精妙的一个不对称</h4>
+    <p>论文原文:"Intermediate generated blocks reused as cache history are re-noised with σ∼U(0,0.15), while the persistent visual anchor is initialized from the unperturbed reference latent."</p>
+    <p>为什么这个不对称如此重要?考虑两种做法:</p>
+    <p><b>对称加噪</b>(锚点也加噪):模型会学到"连锚点都不可靠",于是降低对锚点的依赖 —— 结果恰恰是最需要锁住的身份信号被削弱。</p>
+    <p><b>不对称加噪</b>(只污染历史):模型学到的是"<b>最近的自我生成不可信,但最初的样子可信</b>"。这正是我们想要的先验!它在训练阶段就教会模型"该信谁"。</p>
+    <p>这是一个信息论意义上的<b>信源标注</b>:通过"哪些输入被污染"这个信号,隐式地告诉模型各信源的可靠性排序。论文没有用这个语言表述,但机制是清楚的。</p>
+  </div>
+
+  <h3>6.3 蒸馏目标</h3>
+  <p>论文说:"distribution-matching distillation transfers the guided teacher distribution over the sampled rollout",并补充用 video PCM 促进相邻去噪步之间的一致性:</p>
+  <div class="eq">$$\mathcal L \;=\; \mathcal L_{\text{DMD}} \;+\; 0.03\,\mathcal L_{\text{PCM}}$$</div>
+  <div class="tw"><table>
+    <tr><th>项</th><th>作用</th><th>论文细节</th></tr>
+    <tr><td>\(\mathcal L_{\text{DMD}}\)</td><td>分布匹配蒸馏:让学生分布匹配 teacher 的分布</td><td>引用 Yin et al. 2024a/b</td></tr>
+    <tr><td>\(\mathcal L_{\text{PCM}}\)</td><td>相邻去噪步的一致性(在潜空间与外观敏感特征空间)</td><td>权重 0.03;第 400 步开始;每 2 步评估一次;引用 Wang et al. 2024</td></tr>
+  </table></div>
+  <p>关键设计:<b>记忆更新被 detach</b>。论文原话:"Persistent-memory updates are detached from the optimization graph, allowing extended causal rollouts without retaining gradients through the complete history."</p>
+  <div class="note"><span class="btag">这是一个工程与理论的折中</span>
+    <p>如果记忆更新可微,那么长 rollout 的梯度要穿过所有更新步骤,计算图会爆炸(而且梯度会非常嘈杂)。detach 之后,记忆变成"环境的一部分"——模型学习的是"给定这块记忆,我该怎么生成",而不是"我该怎么改记忆"。<b>代价是记忆的更新规则永远无法端到端优化</b>,必须手工设计。这正是第 3、4 章那些公式必须存在的原因。</p>
+  </div>
+
+  <h3>6.4 训练配置</h3>
+  <div class="tw"><table>
+    <tr><th>项</th><th>值</th><th>备注</th></tr>
+    <tr><td>学生初始化</td><td>蒸馏过的 LTX-2.3 checkpoint</td><td>不是从零训练</td></tr>
+    <tr><td>Teacher</td><td>冻结的双向 LTX-2.3</td><td>CFG:视频 3.0 / 音频 5.0</td></tr>
+    <tr><td>每块去噪步</td><td>3 步</td><td>few-step 的前提</td></tr>
+    <tr><td>学习率</td><td>生成器 \(10^{-5}\) / critic \(2\times10^{-6}\)</td><td>—</td></tr>
+    <tr><td>EMA 衰减</td><td>0.99</td><td>推理用 EMA 权重</td></tr>
+    <tr><td>训练数据</td><td>6,139 条过滤后的合成轨迹</td><td>由双向 teacher 生成</td></tr>
+    <tr><td>轨迹长度</td><td>最多 241 帧,768×512,24fps</td><td>音频对齐到视频时长</td></tr>
+  </table></div>
+
+  <div class="warn"><span class="btag">一个值得追问的地方</span>
+    <h4>6,139 条合成轨迹够吗?</h4>
+    <p>论文的训练数据全部来自 teacher 的合成生成(6,139 条轨迹),没有用真实拍摄的数字人视频。这意味着:</p>
+    <p>(1) 模型的"真实感上限"被 teacher 锁死了 —— 学生不可能超过老师。<br>
+    (2) 更长 horizon 的训练(比如 30 块)没有做,但在 1000 秒(约 200 块)的部署里要滚远超训练长度。<b>混合视野只到 10 块,而部署要 200 块 —— 中间差了 20 倍。</b></p>
+    <p>论文没有讨论这个外推幅度。这可能是因为记忆系统承担了长程一致性的责任,所以单次 rollout 只需要学到"H 步内不出错"——但这个假设本身值得检验(见第 11 章 RQ5)。</p>
+  </div>
+
+  <div class="chnav">
+    <a href="#ch5"><span class="lab">上一章</span><span class="ttl">← 结构匹配条件化</span></a>
+    <a class="next" href="#ch7"><span class="lab">下一章</span><span class="ttl">阶段并行推理 →</span></a>
+  </div>
+</section>
+
+<!-- ============ CH7 ============ -->
+<section id="ch7">
+  <div class="chhead"><div class="chnum">07</div><div>
+    <h2>阶段并行推理:免费的三倍加速</h2>
+    <div class="sub">反对角波前、加速上限,以及一个超过上限的实测数字</div>
+  </div></div>
+
+  <p class="lead">这一章是全文最"系统"的部分:作者发现了一个调度上的浪费,并且用一种不需要重训的方式把它消除。它也是唯一一处<b>实测数字超过了理论上限</b>的地方——值得仔细看。</p>
+
+  <h3>7.1 串行执行的浪费在哪里</h3>
+  <p>常规做法是<b>块级串行</b>:对第 0 块跑完 3 个去噪步,再对第 1 块跑完 3 步……</p>
+  <div class="tw"><table>
+    <tr><th>时刻</th><th>GPU1</th><th>GPU2</th><th>GPU3</th></tr>
+    <tr><td>t=1</td><td>块0·步1</td><td>空闲</td><td>空闲</td></tr>
+    <tr><td>t=2</td><td>块0·步2</td><td>空闲</td><td>空闲</td></tr>
+    <tr><td>t=3</td><td>块0·步3</td><td>空闲</td><td>空闲</td></tr>
+    <tr><td>t=4</td><td>块1·步1</td><td>空闲</td><td>空闲</td></tr>
+    <tr><td>…</td><td>…</td><td>—</td><td>—</td></tr>
+  </table></div>
+  <p>三张卡只有一张在干活。<b>浪费率 2/3。</b></p>
+
+  <h3>7.2 依赖关系分析</h3>
+  <p>关键观察:任务 \((b,k)\)= "第 b 块的第 k 个去噪步"依赖两件事:</p>
+  <ul>
+    <li>\((b,\ k-1)\) —— 同一块的上一步(必须串行);</li>
+    <li>\((b-1,\ k)\) —— 上一块的同一步(因为 KV cache 里要有前块的结果)。</li>
+  </ul>
+  <div class="deriv">
+    <div class="dtitle">命题 7.1 · 可并行集是反对角线</div>
+    <div class="step"><div class="sn">①</div><div class="sc">
+      <p style="margin:0">定义"波前深度" \(\delta=b+k\)。检查依赖是否都指向更小的 \(\delta\):</p>
+      <div class="eq" style="margin:10px 0">$$\delta(b,k-1)=b+k-1=\delta-1 \lt \delta$$</div>
+      <div class="eq" style="margin:10px 0">$$\delta(b-1,k)=b-1+k=\delta-1 \lt \delta$$</div>
+    </div></div>
+    <div class="step"><div class="sn">②</div><div class="sc">
+      <p style="margin:0">两个依赖都严格小于当前 \(\delta\)。所以<b>所有 \(\delta\) 相同的任务互不依赖,可以同时执行</b>。</p>
+      <div class="why">这就是论文说的 "Tasks satisfying b + k = d therefore form an anti-diagonal wavefront"。</div>
+    </div></div>
+    <div class="step"><div class="sn">③</div><div class="sc">
+      <p style="margin:0">总共的执行"波数"就是从 \(\delta_{\min}=0\) 到 \(\delta_{\max}=(B-1)+(K-1)\):</p>
+      <div class="eq" style="margin:10px 0">$$N_{\text{wave}}\;=\;B+K-1$$</div>
+      <div class="why">而串行需要 \(B\times K\) 步。所以加速比上界:</div>
+      <div class="eq" style="margin:10px 0">$$\boxed{\ S_{\max}(B,K)\;=\;\frac{BK}{B+K-1}\ }$$</div>
+    </div></div>
+    <div class="step"><div class="sn">④</div><div class="sc">
+      <p style="margin:0">性质:当 \(B\to\infty\),\(S_{\max}\to K\)(达到 K 倍);当 \(B\) 小,加速比也小(流水线填充的代价)。</p>
+      <div class="tw" style="margin:10px 0"><table>
+        <tr><th>块数 B</th><th>4</th><th>6</th><th>8</th><th>10</th><th>16</th><th>24</th><th>48</th></tr>
+        <tr><td>\(S_{\max}\)(K=3)</td><td>2.00×</td><td>2.25×</td><td>2.40×</td><td>2.50×</td><td>2.67×</td><td>2.77×</td><td>2.88×</td></tr>
+      </table></div>
+      <div class="why">注意:<b>永远达不到 3×</b>——因为流水线填充和排空是不可避免的开销。</div>
+    </div></div>
+  </div>
+
+  <h3>7.3 那个超过上限的数字</h3>
+  <div class="warn"><span class="btag">矛盾</span>
+    <h4>3.15× &gt; 2.50× 上界</h4>
+    <p>论文报告:单卡端到端 11.1 FPS,3 卡 35.0 FPS。比值 \(35.0/11.1=3.15\)。</p>
+    <p>但按上面的波前模型,K=3、B=10 时上界只有 2.50×;即便 B=48 也只有 2.88×。<b>3.15× 超过了 3 卡的理论天花板。</b></p>
+  </div>
+  <p>这不是论文造假——有三个合理的技术解释:</p>
+  <div class="tw"><table>
+    <tr><th>解释</th><th>机理</th><th>能否达到 3.15×</th></tr>
+    <tr><td><b>① 单卡基线含非去噪开销</b></td><td>11.1 FPS 是<b>端到端</b>(含 VAE 解码、数据搬运、后处理);35.0 是<b>输出吞吐</b>。分母不同,比值不是纯流水线加速</td><td>能——如果并行化只加速了去噪部分,而端到端的其他开销被摊薄</td></tr>
+    <tr><td><b>② 单卡显存带宽瓶颈</b></td><td>单卡 72GB 上跑 22B 模型,可能受显存带宽限制;3 卡分片后每卡工作集变小,cache 命中更好</td><td>能——超线性加速在显存受限场景常见</td></tr>
+    <tr><td><b>③ 单卡未做最优批处理</b></td><td>单卡串行时 batch=1,GPU 利用率低;多卡并行时每个 rank 的 batch 更饱满</td><td>能——这是"利用率提升"而非"并行度提升"</td></tr>
+  </table></div>
+  <div class="note"><span class="btag">正确的读法</span>
+    <p>论文的 35 FPS 数字本身是可信的(它超过了 24fps 播放要求 45.8%,这是一个实用门槛)。但把它除以单卡 11.1 FPS 得到"3.15× 加速比"并归因于流水线,是<b>口径混用</b>。严格地说:</p>
+    <p>• <b>能确认的</b>:3 卡 35 FPS,能实时,比 LiveAvatar(5 卡 23 FPS)快 1.52×,比 LongLive-2.0(4 卡 16 FPS)快 2.19×。<br>
+    • <b>不能确认的</b>:"流水线带来了 3.15× 加速"——因为分子分母的统计口径不同。</p>
+  </div>
+
+  <div class="svgwrap">
+  <svg viewBox="0 0 880 350" role="img" aria-label="反对角波前执行示意">
+    <rect width="880" height="350" fill="#fdfbff" rx="16"/>
+    <text x="440" y="26" text-anchor="middle" font-size="14" font-weight="700" fill="#1a1730" font-family="Noto Serif SC,serif">反对角波前:五个块 × 三个去噪步 = 七波,而非十五步</text>
+
+    <!-- grid: blocks 0..4 (5), steps 0..2 (3) -->
+    <!-- cell size 96x62, origin (150, 60) -->
+    <g font-size="11" fill="#76738c">
+      <text x="102" y="46" text-anchor="middle" font-size="10.5">去噪步 k</text>
+      <text x="198" y="46" text-anchor="middle">k=1</text>
+      <text x="294" y="46" text-anchor="middle">k=2</text>
+      <text x="390" y="46" text-anchor="middle">k=3</text>
+    </g>
+    <g font-size="11" fill="#76738c" text-anchor="end">
+      <text x="128" y="88">块 b=0</text><text x="128" y="150">块 b=1</text>
+      <text x="128" y="212">块 b=2</text><text x="128" y="274">块 b=3</text>
+      <text x="128" y="336">块 b=4</text>
+    </g>
+
+    <!-- cells with wave colors -->
+    <!-- delta = b + k where k is 1..3 => use idx k-1 -->
+    <g>
+      <!-- helper: draw all 15 cells, color by wave -->
+      <!-- wave numbers computed: b+(k-1) => 0..6 -->
+      <g id="cells"></g>
+    </g>
+
+    <!-- wave legend -->
+    <g font-size="10.5" text-anchor="middle">
+      <text x="600" y="60" fill="#4c4b5e" font-size="11" font-weight="700">波次 δ = b + k</text>
+      <g id="legend"></g>
+    </g>
+    <text x="600" y="290" font-size="11" fill="#4c4b5e" text-anchor="middle" font-weight="700">总波数 = B + K − 1 = 5 + 3 − 1 = 7</text>
+    <text x="600" y="312" font-size="10.5" fill="#76738c" text-anchor="middle">串行需 15 步 ⇒ 上限加速 15/7 ≈ 2.14×</text>
+  </svg>
+  <p class="svgcap" style="text-align:center"><b>SVG ⑤|自绘</b> —— 同一颜色的格子可以并行执行。最后几波只有少数格子有活,这就是流水线排空的开销,也是为什么加速比永远到不了 K 倍。</p>
+  <script>
+  (function(){
+    const cells = document.getElementById('cells');
+    if(!cells) return;
+    const colors=['#e0e7ff','#c7d2fe','#a5b4fc','#818cf8','#6366f1','#4f46e5','#4338ca'];
+    const textc =['#312e81','#312e81','#312e81','#1e1b4b','#fff','#fff','#fff'];
+    let html='';
+    for(let b=0;b<5;b++){
+      for(let k=0;k<3;k++){
+        const d=b+k;
+        const x=150+k*96, y=60+b*62;
+        html += `<rect x="${x}" y="${y}" width="88" height="52" rx="9" fill="${colors[d]}" stroke="#fff" stroke-width="2"/>`;
+        html += `<text x="${x+44}" y="${y+22}" text-anchor="middle" font-size="10" fill="${textc[d]}" font-family="Noto Sans SC,sans-serif">δ=${d}</text>`;
+        html += `<text x="${x+44}" y="${y+39}" text-anchor="middle" font-size="9.5" fill="${textc[d]}" font-family="Consolas,monospace">(${b},${k+1})</text>`;
+      }
+    }
+    cells.innerHTML = html;
+    const legend=document.getElementById('legend');
+    let lh='';
+    for(let d=0;d<=6;d++){
+      const col = d%2===0 ? 0 : 1;
+      const x = 570 + col*140, y = 76 + Math.floor(d/2)*30;
+      lh += `<rect x="${x}" y="${y}" width="14" height="14" rx="4" fill="${colors[d]}"/>`;
+      lh += `<text x="${x+22}" y="${y+11}" font-size="10" fill="#4c4b5e" text-anchor="start">波 ${d+1} · ${d<=2?d+1:(d<=4?6-d:1)} 个格子</text>`;
+    }
+    legend.innerHTML = lh;
+  })();
+  </script>
+  </div>
+
+  <h3>7.4 "免重训"为什么重要</h3>
+  <p>论文特意对比了 HiAR(Zou et al. 2026):"Unlike HiAR, our method achieves quality-preserving acceleration without pipeline-specific retraining."</p>
+  <div class="tw"><table>
+    <tr><th>方案</th><th>需要重训?</th><th>原因</th></tr>
+    <tr><td>HiAR(论文引用的对照)</td><td>需要</td><td>它改变了去噪的层级结构,模型的输出分布随之变化,必须重训对齐</td></tr>
+    <tr><td><b>TaoMate</b></td><td>不需要</td><td>它只改变<b>执行顺序</b>,不改变任何计算图。每个任务的计算内容完全一样,只是并发执行</td></tr>
+  </table></div>
+  <div class="insight"><span class="btag">深度洞察</span>
+    <h4>为什么这个调度是"合法的":阶段局部缓存的设计</h4>
+    <p>并行化一个自回归过程,最容易出错的地方是<b>缓存一致性</b>:如果 rank 2 用的是 rank 1 刚改过的 cache,而 rank 1 还在算,结果就错了。</p>
+    <p>TaoMate 的关键设计是<b>每个 rank 维护独立的 KV cache</b>(论文:"every pipeline rank is assigned one denoising stage and maintains an independent video–audio KV cache")。而且:</p>
+    <p>"Cleaner outputs from downstream stages are never written back into an upstream cache." —— 更干净的下游输出<b>绝不回写</b>到上游缓存。</p>
+    <p>这条规则保证了每个 rank 看到的都是"自己阶段的历史",计算是<b>确定且可复现</b>的。代价是:上游阶段看不到下游的改进(信息损失),但因为只有 3 步去噪,这个损失可以忽略。</p>
+    <p><b>这是一个漂亮的工程折中:用"信息不完全共享"换取"无需同步"。</b></p>
+  </div>
+
+  <h3>7.5 跨窗口状态:为什么需要窗口</h3>
+  <p>论文说:"We therefore divide the video into a sequence of bounded windows and propagate the cross-window conditioning pair \(S_{n-1}=(P_{n-1},M_{n-1})\)."</p>
+  <div class="tw"><table>
+    <tr><th>组件</th><th>是什么</th><th>管什么</th></tr>
+    <tr><td>\(P_{n-1}\)(clean prefix)</td><td>初始参考 sink + 最近若干干净块</td><td>短程连续性(显式 latents)</td></tr>
+    <tr><td>\(M_{n-1}\)(persistent memory)</td><td>定长记忆</td><td>长程身份与外观一致性(学习到的表示)</td></tr>
+  </table></div>
+  <p>窗口边界上:"only final-stage clean blocks construct \(P_n\) and update \(M_n\)." —— 只有<b>最终阶段</b>的干净块才能写入,保证记忆只吸收高质量内容。</p>
+  <div class="note"><span class="btag">一个细节</span>
+    <p>论文提到"local RoPE coordinates restart for each prompt-conditioned segment"——每个提示段重新开始位置编码。这意味着跨提示段时,模型不会因为"位置数太大"而外推到训练没见过的位置。这是一个实用但常被忽略的细节。</p>
+  </div>
+
+    <h3>本章自测</h3>
+  <details><summary>Q7.1&nbsp; \(B=10,K=3\) 时,串行与并行的步数各是多少?</summary>
+    <div class="ans">串行 \(10\times3=30\) 步;并行 \(10+3-1=12\) 波。加速比 \(30/12=2.5\)。</div></details>
+  <details><summary>Q7.2&nbsp; 为什么加速比永远达不到 \(K\)?</summary>
+    <div class="ans">因为流水线需要填充(前 \(K-1\) 波只有部分 rank 在工作)和排空(最后 \(K-1\) 波同理)。只有 \(B\to\infty\) 时,填充/排空占比趋于 0,才趋近 \(K\)。</div></details>
+  <details><summary>Q7.3&nbsp; 实测 3.15× 超过 2.5× 上界,最可能的解释是什么?</summary>
+    <div class="ans">口径不同:11.1 FPS 是端到端(含 VAE 解码等),35.0 是输出吞吐。另外单卡可能存在显存带宽瓶颈,分片后利用率提升也会带来超线性。</div></details>
+  <details><summary>Q7.4&nbsp; 为什么"每个 rank 独立 cache"是并行化的前提?</summary>
+    <div class="ans">如果共享 cache,一个 rank 写入时另一个 rank 可能在读,需要加锁同步,并行收益被同步开销吃掉。独立 cache 让每个 rank 的计算确定且无依赖,代价是看不到下游阶段的改进。</div></details>
+
+<div class="chnav">
+    <a href="#ch6"><span class="lab">上一章</span><span class="ttl">← 因果上下文蒸馏</span></a>
+    <a class="next" href="#ch8"><span class="lab">下一章</span><span class="ttl">实验核算 →</span></a>
+  </div>
+</section>
+<!-- ============ CH8 ============ -->
+<section id="ch8">
+  <div class="chhead"><div class="chnum">08</div><div>
+    <h2>实验核算:哪些是硬结论,哪些是软声称</h2>
+    <div class="sub">把 Table 1 拆成三组,看每个数字能支撑多强的断言</div>
+  </div></div>
+
+  <p class="lead">论文的主表有 9 行方法、7 个指标。但不同指标的证据强度差别极大。这一章按"能支撑多强的结论"把它们分成三组。</p>
+
+  <h3>8.1 完整数据表</h3>
+  <div class="tw"><table>
+    <caption>数据全部转录自论文 Table 1。TaoMate 列加粗处为论文标注的最优/次优。参数列 "22B/18B" 表示 MOVA 的双模型规格。</caption>
+    <tr><th>方法</th><th>参数</th><th>LipSync↑</th><th>Desync↓</th><th>Align.↑</th><th>Express.↑</th><th>Long Cons.↑</th><th>Color Δ↓</th><th>DiT FPS↑</th></tr>
+    <tr><td>OmniAvatar</td><td>1.3B</td><td>4.794</td><td>–</td><td>–</td><td>–</td><td>0.6467</td><td>0.01566</td><td>0.948</td></tr>
+    <tr><td>StableAvatar</td><td>1.3B</td><td>3.246</td><td>–</td><td>–</td><td>–</td><td>0.9242</td><td>0.00895</td><td>0.352</td></tr>
+    <tr><td>Wan2.2-S2V-14B</td><td>14B</td><td>4.898</td><td>–</td><td>–</td><td>–</td><td>0.8413</td><td>0.00814</td><td>0.079</td></tr>
+    <tr><td>LiveAvatar</td><td>14B</td><td>5.396</td><td>–</td><td>–</td><td>–</td><td>0.9619</td><td>0.00541</td><td>4.529</td></tr>
+    <tr><td>Hallo3</td><td>5B</td><td>4.855</td><td>–</td><td>–</td><td>–</td><td>0.7947</td><td>0.01383</td><td>0.150</td></tr>
+    <tr><td>LongLive-2.0</td><td>5B</td><td>–</td><td>–</td><td>–</td><td>–</td><td>0.7221</td><td>0.01792</td><td>10.47</td></tr>
+    <tr><td>LTX-2.3</td><td>22B</td><td>2.349</td><td>0.050</td><td>4.35</td><td>3.60</td><td>0.3745</td><td>0.04387</td><td>0.262</td></tr>
+    <tr><td>JavisDiT++</td><td>2.1B</td><td>0.904</td><td>1.025</td><td>5.00</td><td>3.90</td><td>0.3545</td><td>0.07159</td><td>0.437</td></tr>
+    <tr><td>MOVA</td><td>32B/18B</td><td>3.860</td><td>0.060</td><td>5.00</td><td>3.75</td><td>0.7129</td><td>0.02825</td><td>0.128</td></tr>
+    <tr><td>OVI</td><td>11B</td><td>3.493</td><td>0.135</td><td>4.60</td><td>3.70</td><td>0.8252</td><td>0.01797</td><td>0.231</td></tr>
+    <tr><td>OmniForcing</td><td>22B</td><td>1.590</td><td>0.045</td><td>5.00</td><td>3.95</td><td>0.3404</td><td>0.02060</td><td>8.14</td></tr>
+    <tr><td><b>TaoMate</b></td><td>22.1B</td><td><b>5.918</b></td><td><b>0.000</b></td><td>5.00</td><td><b>4.00</b></td><td><b>0.9755</b></td><td><b>0.00260</b></td><td><b>16.32</b></td></tr>
+  </table></div>
+
+  <h3>8.2 第一组:硬结论(有明确对手、明确量级)</h3>
+  <div class="tw"><table>
+    <tr><th>指标</th><th>TaoMate</th><th>最强对手</th><th>差距</th><th>为什么算硬</th></tr>
+    <tr><td><b>LipSync</b></td><td>5.918</td><td>LiveAvatar 5.396</td><td>+9.7%</td><td>来自官方 VABench 协议,同口径;对手是 14B 的成熟系统</td></tr>
+    <tr><td><b>Color Δ</b></td><td>0.00260</td><td>LiveAvatar 0.00541</td><td><b>−51.9%</b></td><td>减半,量级明显;且与 Figure 1 的肉眼对比一致</td></tr>
+    <tr><td><b>DiT FPS</b></td><td>16.32</td><td>LongLive-2.0 10.47</td><td>+55.9%</td><td>硬件相同(同一张 RTX PRO 5000),纯去噪吞吐</td></tr>
+    <tr><td><b>3 卡输出 FPS</b></td><td>35.0</td><td>LiveAvatar 23.0(5卡)</td><td>+52%</td><td>用更少卡达到更高帧率,且超过 24fps 播放门槛</td></tr>
+  </table></div>
+  <p>这四个是真正站得住的:有明确对手、同为公开指标、差距大到不可能由噪声解释。</p>
+
+  <div class="figure"><img src="assets/fig4_qualitative.png" alt="一分钟生成的定性对比">
+    <p class="figcap"><b>论文 Figure 4</b>:一分钟生成的两组定性对比(左:年轻女性评测护肤品;右:老人讲解毛笔)。每列是同一方法在 0s / 15s / 30s / 1min 的采样帧。OmniForcing 在 1min 时白平衡明显偏移、面部结构变形;LTX-2.3 出现晚期面部与背景伪影;MOVA 与 OVI 的面貌、构图或场景出现较大变化。TaoMate(最下行)保持了同一张脸、同一构图与同一色调。</p>
+  </div>
+
+  <h3>8.3 第二组:软结论(自建指标 + 无对手值)</h3>
+  <div class="tw"><table>
+    <tr><th>指标</th><th>问题</th><th>能说什么</th></tr>
+    <tr><td><b>Long Consistency</b></td><td>S2V 方法(OmniAvatar/StableAvatar/Wan/LiveAvatar/Hallo3)<b>没有这项</b>;有值的三方(LTX/Javis/MOVA/OVI/OmniForcing)都低于 0.83</td><td>可以说"在自建长视频基准上领先";<b>不能</b>说"全面优于所有 S2V 方法"——因为对手没被测</td></tr>
+    <tr><td><b>Desync</b></td><td>只有 5 家有值,其中 4 家是联合音视频模型;TaoMate 的 0.000 好得可疑</td><td>值得追问:0.000 是精确 0 还是四舍五入?若是精确 0,说明该指标在这条样本上饱和</td></tr>
+    <tr><td><b>Face Consistency</b></td><td>只用于消融,无跨方法对比</td><td>只能用于内部比较</td></tr>
+  </table></div>
+
+  <div class="warn"><span class="btag">最需要追问的数字</span>
+    <h4>Desync = 0.000</h4>
+    <p>Desync 度量音画不同步程度,越低越好。TaoMate 报告 <b>0.000</b>,第二名是 OmniForcing 的 0.045。</p>
+    <p>两种可能:(a) 确实做到了完美同步(联合生成 + 同一 DiT 建模,理论上可以把不同步压到极小);(b) 该指标在 60 秒样本上的分辨率不足,小于某个阈值就被记为 0。</p>
+    <p>论文没有给出该指标的量纲与分辨率。作为读者,我倾向于认为 <b>(a) 有一定道理但 (b) 不可排除</b>——毕竟一个"完美 0"在测量学上总是可疑的。<b>这一点应记为"待核实"。</b></p>
+  </div>
+
+  <h3>8.4 第三组:跨类比较(不可直接比)</h3>
+  <p>Table 1 把 S2V(语音驱动)、联合音视频、T2V/I2V 三类方法放在一张表里。论文很诚实地说明了这一点:</p>
+  <p class="small" style="border-left:3px solid var(--lav-300);padding-left:14px">"All systems follow the same script content, but retain their native resolution, frame rate, and long-form construction procedure."</p>
+  <div class="tw"><table>
+    <tr><th>类别</th><th>方法</th><th>为什么不能直接比</th></tr>
+    <tr><td>语音驱动(S2V)</td><td>OmniAvatar, StableAvatar, Wan2.2-S2V, LiveAvatar, Hallo3</td><td>输入是<b>给定音频</b>,只需生成匹配的口型;不需要合成语音。LipSync 天然有优势(音频是干净的)</td></tr>
+    <tr><td>联合音视频</td><td>LTX-2.3, JavisDiT++, MOVA, OVI, OmniForcing</td><td>与 TaoMate 同赛道,是<b>真正的对手</b></td></tr>
+    <tr><td>T2V/I2V</td><td>LongLive-2.0</td><td>只生成视频,<b>不生成音频</b>,所以没有 LipSync/Desync 指标</td></tr>
+  </table></div>
+  <div class="insight"><span class="btag">深度洞察</span>
+    <h4>真正公平的对比只有一行:OmniForcing</h4>
+    <p>在所有 11 个基线的对比中,只有 <b>OmniForcing(22B)</b> 是真正同口径的:同样 22B 量级、同样是因果自回归、同样是联合音视频、同样在这个长视频基准上跑。</p>
+    <p>与它的对比才是"方法的净效果":</p>
+    <div class="tw" style="margin:10px 0"><table>
+      <tr><th></th><th>OmniForcing</th><th>TaoMate</th><th>变化</th></tr>
+      <tr><td>Long Cons.</td><td>0.3404</td><td>0.9755</td><td><b>+186%</b></td></tr>
+      <tr><td>Color Δ</td><td>0.02060</td><td>0.00260</td><td><b>−87%</b></td></tr>
+      <tr><td>LipSync</td><td>1.590</td><td>5.918</td><td><b>+272%</b></td></tr>
+      <tr><td>DiT FPS</td><td>8.14</td><td>16.32</td><td>+100%</td></tr>
+    </table></div>
+    <p>这组数字非常惊人。但要注意:OmniForcing 在 Table 1 里的 LipSync(1.59)甚至低于 LTX-2.3(2.35),而 Long Cons.(0.34)接近 LTX-2.3(0.37)——这说明<b>它在这个特定基准上表现很差</b>。所以"TaoMate 是 OmniForcing 的 3.7 倍"这句话要谨慎:可能只是 OmniForcing 不适配这个基准,而不是 TaoMate 真的强 3.7 倍。</p>
+  </div>
+
+  <h3>8.5 复现性核算</h3>
+  <div class="tw"><table>
+    <tr><th>项</th><th>论文给的</th><th>够不够复现</th></tr>
+    <tr><td>学生初始化</td><td>蒸馏过的 LTX-2.3 checkpoint</td><td>✗ 未给具体 checkpoint 链接</td></tr>
+    <tr><td>Teacher</td><td>冻结双向 LTX-2.3,CFG 3.0/5.0</td><td>部分(型号明确,权重未给)</td></tr>
+    <tr><td>训练数据</td><td>6,139 条合成轨迹,241 帧,768×512</td><td>✗ 数据未公开</td></tr>
+    <tr><td>超参</td><td>β/λ/τ/Tg/gmin/PCM 权重全部给出</td><td>✓ 完整</td></tr>
+    <tr><td>架构细节</td><td>"deferred to the supplementary material"</td><td>正文✗,补充材料可能有</td></tr>
+    <tr><td>评测协议</td><td>VABench 官方 + 自建长视频基准</td><td>部分(VABench 公开,自建基准未给)</td></tr>
+  </table></div>
+  <p>总体判断:<b>超参层面足以复现,但数据与权重层面不足。</b>这对工业论文是常态,但也意味着"独立复现"目前不可能。</p>
+
+  <div class="chnav">
+    <a href="#ch7"><span class="lab">上一章</span><span class="ttl">← 阶段并行推理</span></a>
+    <a class="next" href="#ch9"><span class="lab">下一章</span><span class="ttl">消融的悖论 →</span></a>
+  </div>
+</section>
+
+<!-- ============ CH9 ============ -->
+<section id="ch9">
+  <div class="chhead"><div class="chnum">09</div><div>
+    <h2>消融的悖论:为什么加了 FiLM 反而更差</h2>
+    <div class="sub">Table 3 里那个"反直觉"的行,藏着整个方法的核心逻辑</div>
+  </div></div>
+
+  <p class="lead">论文的消融表里有一行非常反直觉:<b>加了 FiLM,三个指标全部变差</b>。而再加上门控,又全部变好,且超过"什么都没有"的基线。这一章解释这个 U 形。</p>
+
+  <h3>9.1 Table 3 的完整数据</h3>
+  <div class="tw"><table>
+    <caption>转录自论文 Table 3。✓ 表示该组件存在。三列指标的"最优"在最后一行(全开)。</caption>
+    <tr><th>Memory</th><th>FiLM</th><th>Gate</th><th>Long Cons.↑</th><th>Color Δ↓</th><th>Face Cons.↑</th></tr>
+    <tr><td>–</td><td>–</td><td>–</td><td>0.9614</td><td>0.00380</td><td>0.9955</td></tr>
+    <tr><td>✓</td><td>–</td><td>–</td><td><b>0.9653</b></td><td><b>0.00316</b></td><td>0.9956</td></tr>
+    <tr><td>✓</td><td>✓</td><td>–</td><td>0.9620</td><td>0.00347</td><td><b>0.9947</b></td></tr>
+    <tr><td>✓</td><td>✓</td><td>✓</td><td><b>0.9676</b></td><td><b>0.00276</b></td><td><b>0.9962</b></td></tr>
+  </table></div>
+
+  <h3>9.2 逐行计算变化量</h3>
+  <div class="deriv">
+    <div class="dtitle">核算:每一步到底加了多少</div>
+    <div class="step"><div class="sn">①</div><div class="sc">
+      <p style="margin:0"><b>基线 → 加记忆</b>(无 FiLM、无门控):</p>
+      <div class="eq" style="margin:8px 0">$$\Delta\text{Long} = 0.9653-0.9614=+0.0039,\quad \Delta\text{Color} = \frac{0.00316-0.00380}{0.00380}=-16.8\%$$</div>
+      <div class="why">论文说"raises Long Consistency by 0.0039 and lowers Color Δ by 16.8%",与我算的完全一致 ✓。Face 只变 +0.0001(论文说 "changes by only 0.0001" ✓)。</div>
+    </div></div>
+    <div class="step"><div class="sn">②</div><div class="sc">
+      <p style="margin:0"><b>加记忆 → 再加 FiLM</b>(无门控):</p>
+      <div class="eq" style="margin:8px 0">$$\Delta\text{Long}=0.9620-0.9653=-0.0033,\quad \Delta\text{Face}=0.9947-0.9956=-0.0009,\quad \Delta\text{Color}=\frac{0.00347-0.00316}{0.00316}=+9.8\%$$</div>
+      <div class="why">三项全部变差。论文原文:"erodes these gains: Long and Face Consistency decrease by 0.0033 and 0.0009, respectively, while Color Δ increases by 9.8%" ✓ 数字吻合。</div>
+    </div></div>
+    <div class="step"><div class="sn">③</div><div class="sc">
+      <p style="margin:0"><b>加 FiLM → 再加门控</b>:</p>
+      <div class="eq" style="margin:8px 0">$$\Delta\text{Long}=0.9676-0.9620=+0.0056,\quad \Delta\text{Face}=0.9962-0.9947=+0.0015,\quad \Delta\text{Color}=\frac{0.00276-0.00347}{0.00347}=-20.5\%$$</div>
+      <div class="why">论文:"raises the two consistency scores by 0.0056 and 0.0015 and reduces Color Δ by 20.5%" ✓ 完全一致。</div>
+    </div></div>
+  </div>
+  <p>所有数字核对无误。所以这不是笔误,是真实结果。</p>
+
+  <h3>9.3 为什么会这样:一个机制解释</h3>
+  <p>论文给的解释是:"appearance modulation is effective when unreliable recurrent observations are suppressed before conditioning future blocks."</p>
+  <p>把它展开成因果链:</p>
+  <div class="svgwrap">
+  <svg viewBox="0 0 880 330" role="img" aria-label="FiLM 无门控时误差如何被放大">
+    <rect width="880" height="330" fill="#fdfbff" rx="16"/>
+    <text x="440" y="26" text-anchor="middle" font-size="14" font-weight="700" fill="#1a1730" font-family="Noto Serif SC,serif">为什么"没有门控的 FiLM"是负收益:一条正反馈链</text>
+
+    <!-- step 1 -->
+    <g>
+      <rect x="30" y="56" width="182" height="86" rx="12" fill="#fff1f2" stroke="#fecdd3"/>
+      <text x="121" y="80" text-anchor="middle" font-size="11.5" font-weight="700" fill="#9f1239">① 观测带误差</text>
+      <text x="121" y="100" text-anchor="middle" font-size="10" fill="#be123c">某块的肤色偏了一点</text>
+      <text x="121" y="120" text-anchor="middle" font-size="10" fill="#be123c">(累积误差,不可避免)</text>
+    </g>
+    <path d="M212 99 L244 99" stroke="#fb7185" stroke-width="2" marker-end="url(#arX)"/>
+    <defs><marker id="arX" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 z" fill="#fb7185"/></marker></defs>
+
+    <!-- step 2 -->
+    <g>
+      <rect x="248" y="56" width="182" height="86" rx="12" fill="#fef3c7" stroke="#fde68a"/>
+      <text x="339" y="80" text-anchor="middle" font-size="11.5" font-weight="700" fill="#78350f">② 无门控 ⇒ 全量吸收</text>
+      <text x="339" y="100" text-anchor="middle" font-size="10" fill="#b45309">β_c g=0.03 全额生效</text>
+      <text x="339" y="120" text-anchor="middle" font-size="10" fill="#b45309">误差进入 κ_t, π_t</text>
+    </g>
+    <path d="M430 99 L462 99" stroke="#f59e0b" stroke-width="2" marker-end="url(#arY)"/>
+    <defs><marker id="arY" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 z" fill="#f59e0b"/></marker></defs>
+
+    <!-- step 3 -->
+    <g>
+      <rect x="466" y="56" width="182" height="86" rx="12" fill="#ffe4e6" stroke="#fda4af"/>
+      <text x="557" y="80" text-anchor="middle" font-size="11.5" font-weight="700" fill="#9f1239">③ FiLM 把误差放大</text>
+      <text x="557" y="100" text-anchor="middle" font-size="10" fill="#be123c">γ, b 作用于所有 token</text>
+      <text x="557" y="120" text-anchor="middle" font-size="10" fill="#be123c">⇒ 整幅画面的色调被带偏</text>
+    </g>
+    <path d="M648 99 L680 99" stroke="#f43f5e" stroke-width="2" marker-end="url(#arZ)"/>
+    <defs><marker id="arZ" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 z" fill="#f43f5e"/></marker></defs>
+
+    <!-- step 4 -->
+    <g>
+      <rect x="684" y="56" width="170" height="86" rx="12" fill="#fecdd3" stroke="#f43f5e"/>
+      <text x="769" y="80" text-anchor="middle" font-size="11.5" font-weight="700" fill="#881337">④ 下一块更偏</text>
+      <text x="769" y="100" text-anchor="middle" font-size="10" fill="#9f1239">以偏了的画面为条件</text>
+      <text x="769" y="120" text-anchor="middle" font-size="10" fill="#9f1239">⇒ 正反馈</text>
+    </g>
+
+    <!-- feedback arrow -->
+    <path d="M769 142 C 769 200, 121 200, 121 142" stroke="#f43f5e" stroke-width="2" fill="none" stroke-dasharray="6 4" marker-end="url(#arZ)"/>
+    <text x="440" y="196" text-anchor="middle" font-size="11" fill="#be123c" font-weight="700">误差闭环,自我强化</text>
+
+    <!-- bottom: with gate -->
+    <g>
+      <rect x="30" y="222" width="820" height="94" rx="12" fill="#ecfdf5" stroke="#a7f3d0"/>
+      <text x="440" y="246" text-anchor="middle" font-size="12" font-weight="700" fill="#065f46">加上门控后:在②之前插一道闸</text>
+      <text x="440" y="268" text-anchor="middle" font-size="10.5" fill="#047857">若该块与锚点结构不符(ρ 低)⇒ g 小 ⇒ β_c·g 小 ⇒ 误差几乎不进入外观记忆</text>
+      <text x="440" y="288" text-anchor="middle" font-size="10.5" fill="#047857">再叠加"硬拒绝":归一化偏差超范围 ⇒ 直接不更新(κ,π 保持上一轮)</text>
+      <text x="440" y="306" text-anchor="middle" font-size="10" fill="#065f46">结果:闭环被切断,外观记忆只吸收"结构一致"的观测</text>
+    </g>
+  </svg>
+  <p class="svgcap" style="text-align:center"><b>SVG ⑥|自绘</b> —— FiLM 本身是"放大器":它把外观统计的影响施加到所有 token。放大器本身没错,错在没有先过滤掉噪声。</p>
+  </div>
+
+  <div class="insight"><span class="btag">深度洞察</span>
+    <h4>这是一个"放大器 × 噪声源"的乘法关系</h4>
+    <p>把 FiLM 和门控看成两个因子的乘积:</p>
+    <p>• <b>FiLM 提供"作用强度"</b>:它决定外观统计能影响多少像素。<br>
+    • <b>门控提供"输入质量"</b>:它决定喂进去的统计量有多干净。</p>
+    <p>净收益 ≈ (作用强度) × (输入信噪比)。当信噪比为负(噪声主导)时,<b>作用强度越大,乘出来的负收益越大</b>。这完美解释了为什么"FiLM 无门控"比"什么都没有"更差——它把噪声放大了。</p>
+    <p>这也给出一个可推广的设计原则:<b>在给模型加任何"全局调制"机制之前,必须先保证它的输入是可滤的。</b>否则调制越强越糟。</p>
+  </div>
+
+  <h3>9.4 门控带来的"双重收益"</h3>
+  <p>注意最后一行不只是"回到基线",而是<b>超过了所有其他行</b>:</p>
+  <div class="tw"><table>
+    <tr><th>对比</th><th>Long Cons.</th><th>Color Δ</th><th>Face Cons.</th></tr>
+    <tr><td>最佳无门控配置</td><td>0.9653</td><td>0.00316</td><td>0.9956</td></tr>
+    <tr><td>全开(带门控)</td><td><b>0.9676</b></td><td><b>0.00276</b></td><td><b>0.9962</b></td></tr>
+    <tr><td>增益</td><td>+0.0023</td><td>−12.7%</td><td>+0.0006</td></tr>
+  </table></div>
+  <p>也就是说:门控不只是"止损",它让<b>FiLM 真正发挥了作用</b>。这是一个典型的"两个组件互相成就"的例子——单独看每个都是负的或零的,组合起来是正的。</p>
+
+  <h3>9.5 但消融的完整性有问题</h3>
+  <div class="warn"><span class="btag">批判</span>
+    <h4>缺了 4 个本该有的格子</h4>
+    <p>Table 3 只测了 4 种组合(全无 / 仅记忆 / 记忆+FiLM / 全开),缺了:</p>
+    <p>(1) <b>仅门控</b>(无记忆、无 FiLM)—— 门控单独有多少贡献?<br>
+    (2) <b>仅 FiLM</b>(无记忆)—— FiLM 是否依赖记忆?<br>
+    (3) <b>记忆 + 门控</b>(无 FiLM)—— 门控是否独立于 FiLM 有益?<br>
+    (4) <b>锚点不加噪 vs 加噪</b> —— 第 6 章那个"最精妙的不对称"完全没有消融!</p>
+    <p>没有 (3),就无法判断"门控的收益"是来自它本身,还是来自它与 FiLM 的交互。论文的结论("Gating recurrent updates by anchor agreement...producing the best result on every metric")只能说明"全开最好",<b>不能说明门控单独有多大价值</b>。</p>
+    <p>而 (4) 的缺失更关键:第 6 章的不对称加噪是论文叙事的重要组成部分,却没有任何数据支撑它比"对称加噪"或"完全不加噪"更好。这是<b>一个明显的主张-证据缺口</b>。</p>
+  </div>
+
+  <div class="chnav">
+    <a href="#ch8"><span class="lab">上一章</span><span class="ttl">← 实验核算</span></a>
+    <a class="next" href="#ch10"><span class="lab">下一章</span><span class="ttl">批判性评估 →</span></a>
+  </div>
+</section>
+
+<!-- ============ CH10 ============ -->
+<section id="ch10">
+  <div class="chhead"><div class="chnum">10</div><div>
+    <h2>批判性评估</h2>
+    <div class="sub">七个可以合理质问的地方,按严重度排序</div>
+  </div></div>
+
+  <p class="lead">这一章不重复论文的优点。只列"如果我是审稿人,会写进意见里"的问题。</p>
+
+  <h3>10.1 基准只有单主体、单场景</h3>
+  <p>论文的评测基准:"single-presenter scenarios in both Mandarin and English"。每个提示序列里,<b>主体、场景、相机、声音的描述在整个序列中保持不变</b>,只有动作和台词在变。</p>
+  <div class="tw"><table>
+    <tr><th>这个设定测到了</th><th>这个设定测不到</th></tr>
+    <tr><td>同一主体在 5 分钟内的身份保持</td><td><b>主体切换</b>(换人、多人对话)</td></tr>
+    <tr><td>同一场景的色调稳定</td><td><b>场景切换</b>(走出房间、换外景)</td></tr>
+    <tr><td>同一机位的构图稳定</td><td><b>镜头运动</b>、多机位</td></tr>
+    <tr><td>语音合成与口型同步</td><td><b>非语音声音</b>(音乐、环境声)</td></tr>
+  </table></div>
+  <p>而"real-time long-form digital human"的真实应用(直播带货、虚拟客服)恰恰需要后一列的能力。所以论文的评测只覆盖了任务的一个子集,而<b>标题与摘要读起来像覆盖全部</b>。</p>
+
+  <h3>10.2 关键指标无真值、无外部验证</h3>
+  <p>Long Consistency 与 Color Δ 是论文自建指标。论文说"their exact definitions are provided in the supplementary material",正文没有给出公式。</p>
+  <div class="warn"><span class="btag">这带来三个问题</span>
+    <h4>自建指标的三重风险</h4>
+    <p><b>(1) 可被优化。</b>如果 Color Δ 定义成"相邻区间颜色直方图的 L1 差",那么一个"颜色完全不动"的视频会得满分——即使它颜色本来就是错的(比如把肤色生成成了蓝色)。<b>稳定 ≠ 正确</b>。</p>
+    <p><b>(2) 无外部基准。</b>S2V 系列方法没有这两个指标的值,所以 Table 1 里它们显示 "–"。这意味着"TaoMate 的 Long Cons. 最高"这句话,只在一个<b>自家定义的指标、自家构造的基准</b>上成立。</p>
+    <p><b>(3) 尺度未知。</b>0.9755 vs 0.9619 的差距是 1.4%。这个差距在人类观看时是否能感知?没有做用户研究(no user study / MOS),这在数字人领域是标准做法。</p>
+  </div>
+
+  <h3>10.3 22.1B 的部署代价被轻描淡写</h3>
+  <div class="tw"><table>
+    <tr><th>资源</th><th>需求</th><th>论文表述</th></tr>
+    <tr><td>单卡部署</td><td>RTX PRO 5000 72GB,11.1 FPS</td><td>诚实给出</td></tr>
+    <tr><td>实时部署</td><td><b>3 张</b> RTX PRO 5000 72GB</td><td>"real-time" 一词未强调需要 3 卡</td></tr>
+    <tr><td>显存合计</td><td>约 216GB</td><td>未提及</td></tr>
+  </table></div>
+  <p>3 张 72GB 的卡,按市场价是相当大的投入。而 Table 2 的对比也有点不对称:LiveAvatar 用 5 卡、LongLive-2.0 用 4 卡、TaoMate 用 3 卡——<b>三者的"实时"是在不同硬件配置下定义的</b>。论文没有给出"单卡是否也能实时"这个关键问题的答案(11.1 FPS 显然不能)。</p>
+
+  <h3>10.4 时间复杂度的声称过强</h3>
+  <p>论文多次强调记忆成本"independent of generated duration"。严格地说:</p>
+  <div class="deriv">
+    <div class="dtitle">计算:哪些成本是常数,哪些不是</div>
+    <div class="step"><div class="sn">①</div><div class="sc">
+      <p style="margin:0"><b>确实是常数的</b>:记忆存储(48/64 tokens)、记忆注意力的 KV 大小、每次更新的计算量。</p>
+    </div></div>
+    <div class="step"><div class="sn">②</div><div class="sc">
+      <p style="margin:0"><b>不是常数的</b>:活动上下文 \(C_{t-1}\) 里的"初始参考 sink + 最近 ≤2 块"是常数,但<b>生成第 t 块的总计算</b>仍要跑 3 个去噪步 × 22B 参数。这个成本与 t 无关,但它本身很大(11.1 FPS)。</p>
+    </div></div>
+    <div class="step"><div class="sn">③</div><div class="sc">
+      <p style="margin:0"><b>真正无法常数的</b>:如果要保证"绝对不漂移",理论上的最优解是保留全部历史(带权)。记忆系统是一个<b>有信息损失的近似</b>。所以准确的说法是:</p>
+      <div class="eq" style="margin:8px 0">$$\text{成本}=O(1)\quad\text{但}\quad\text{一致性}\le\text{全历史上界}$$</div>
+      <div class="why">论文没有讨论这个上界有多紧。从 Table 3 看,Long Cons. 从 0.9614 提到 0.9676(+0.6%),这个提升幅度是否值得 97.8M 参数与 3 卡部署,是可以商榷的。</div>
+    </div></div>
+  </div>
+
+  <h3>10.5 没有和"更长窗口"这个简单基线比</h3>
+  <p>面对"长期证据丢失",最简单的解法是<b>把窗口开大一点</b>(比如留最近 8 块而不是 2 块)。这不需要任何新参数,只需要更多显存。</p>
+  <div class="tw"><table>
+    <tr><th>基线</th><th>是否被比较</th><th>为什么重要</th></tr>
+    <tr><td>无记忆(w=2 块)</td><td>✓(Table 3 第一行)</td><td>—</td></tr>
+    <tr><td><b>大窗口</b>(如 w=8,16)</td><td><b>✗</b></td><td>必须证明"记忆"优于"多留几块",否则记忆的复杂度不值得</td></tr>
+    <tr><td>全历史 cache</td><td>✗</td><td>论文在引言里论证了它不好(成本 + 误差),但没有实测</td></tr>
+    <tr><td>单纯加长训练 rollout</td><td>✗</td><td>混合视野到 10 块 vs 只训 5 块,这个消融也没有</td></tr>
+  </table></div>
+  <p>这是最实质的一个方法学批评:<b>论文证明"记忆比无记忆好",但没有证明"记忆比更简单的替代方案好"</b>。而后者才是方法存在的理由。</p>
+
+  <h3>10.6 "免重训"的优势被高估</h3>
+  <p>论文强调阶段并行"without pipeline-specific retraining"。这确实是一个工程优势。但要看清它的适用范围:</p>
+  <ul>
+    <li>它只加速<b>推理</b>,不减少训练成本(训练仍需 teacher + 蒸馏);</li>
+    <li>它要求<b>多卡</b>——单卡上完全没有这个优势;</li>
+    <li>它依赖"每个 rank 独立 cache"这个设计,而这个设计本身是为了并行才引入的。</li>
+  </ul>
+  <p>所以它不是"免费的午餐",而是"用工程复杂度换吞吐"。</p>
+
+  <h3>10.7 引用与文献定位</h3>
+  <p>论文引用了大量 2026 年的工作(LTX-2、OmniForcing、Self-Forcing、Causal Forcing、Mutual Forcing、AvatarForcing、TetherCache、Pyramid Forcing、Sparse Forcing、OmniMem、FadeMem、Anchor Forcing、MaineCoon、HiAR 等)。这显示出作者对最新进展非常熟悉。</p>
+  <div class="note"><span class="btag">给读者的提醒</span>
+    <p>本文在写作时对少数条目做了外部核实(LTX-Video 2501.00103 确认存在;Ovi 2510.01284 与 MOVA 2602.08794 标题确认)。其余条目因网络原因未能逐一验证。<b>博客中凡是提到具体方法时,都标注"论文引用"并给出论文中的精确标题,不做超出论文范围的事实断言。</b></p>
+  </div>
+
+  <h3>10.8 站得住的部分(对称起见)</h3>
+  <div class="insight"><span class="btag">成立</span>
+    <h4>这四条我认为是硬的</h4>
+    <p><b>1. 分解本身是对的。</b>"有界活动上下文 + 定长持久记忆"这个分解在数学上是干净的:条件成本 O(1),因果性由 \(M_t\) 在 \(z_t\) 之后更新保证。</p>
+    <p><b>2. 权重守恒与几何遗忘是可验证的。</b>式 (4) 的三个系数和为 1,观测权重按 \(c^k\) 衰减——这两条我独立算了,完全成立。</p>
+    <p><b>3. FiLM + 门控的 U 形是真实的。</b>Table 3 的四个数字我逐项核对,%变化与论文表述完全一致,不存在算错。</p>
+    <p><b>4. 实时性是真的。</b>35 FPS &gt; 24 FPS 这个门槛是硬指标,且用 3 卡比对手用 4–5 卡还快。</p>
+  </div>
+
+  <div class="chnav">
+    <a href="#ch9"><span class="lab">上一章</span><span class="ttl">← 消融的悖论</span></a>
+    <a class="next" href="#ch11"><span class="lab">下一章</span><span class="ttl">自主科研问题 →</span></a>
+  </div>
+</section>
+
+<!-- ============ CH11 ============ -->
+<section id="ch11">
+  <div class="chhead"><div class="chnum">11</div><div>
+    <h2>自主科研问题</h2>
+    <div class="sub">五个从这篇论文里长出来的、可以做成课题的问题</div>
+  </div></div>
+
+  <p class="lead">以下问题不是论文 limitation 的复述,而是从它的数学结构里推出的、它没回答的空白。</p>
+
+  <div class="rq">
+    <span class="tag">RQ1 · 自适应遗忘</span>
+    <h4>固定的 (β, λ) 是最优的吗?能否让遗忘率本身成为可学习的对象?</h4>
+    <p>TaoMate 的三组超参是手工设定并在全训练过程中固定的。但从第 3 章的稳态份额公式看,锚点份额 \(=\lambda/(\lambda+\beta-\lambda\beta)\) 完全由 \((\beta,\lambda)\) 决定。一个自然的疑问:<b>如果环境本身在变(前 60 秒是室内,后 60 秒走到户外),固定 62.5% 的锚点份额是否会阻碍合理的适应?</b></p>
+    <p><b>数学形式化。</b>把 \(\lambda_t\) 变成一个状态相关的量:</p>
+    <div class="eq">$$\lambda_t=\lambda_0\,\psi\big(\rho_t,\ \|\kappa^*_t-\kappa_{t-1}\|\big),\qquad \psi\in(0,1]$$</div>
+    <p>其中 \(\rho_t\) 是结构一致性,第二项是外观变化幅度。直觉:当外观发生<b>合法的大幅变化</b>(如换场景)时,降低 \(\lambda_t\);当外观只是随机漂移时,提高 \(\lambda_t\)。<b>难点</b>:这两者如何区分?一个可能判据是"变化是否与文本条件 \(e_t\) 相关"——如果 prompt 说了"走到窗边",那么光照变化是预期的;如果没说,就是漂移。</p>
+    <p><b>连接工作。</b>这类似于卡尔曼滤波里的自适应过程噪声(adaptive Kalman filter),其中 \(Q_t\) 根据新息的统计特性调整。也可参考 change-point detection(CUSUM)的思路,把"合法变化"与"漂移"视为两种不同的 regime。</p>
+    <p><b>验证方式。</b>设计一个"中途换场景"的基准(现有基准刻意保持不变,所以测不出来),比较固定 \(\lambda\) 与自适应 \(\lambda\) 在"适应速度 vs 漂移抑制"上的帕累托前沿。</p>
+    <div class="meta">难度:中 · 需要新基准 · 有明确的可证伪预测(自适应应在换场景任务上胜出,在固定场景上打平)</div>
+  </div>
+
+  <div class="rq">
+    <span class="tag">RQ2 · 鲁棒性理论</span>
+    <h4>门控 + 硬拒绝的组合,在鲁棒统计意义下的崩溃点(breakdown point)是多少?</h4>
+    <p>第 4 章指出外观分支用了"软门控 + 硬拒绝"两层,但论文没有给出阈值的选择依据。这在鲁棒统计里是一个有标准答案的问题:<b>一个估计器的崩溃点,是它能容忍的离群观测比例上限。</b></p>
+    <p><b>数学形式化。</b>把外观更新视为一个在线 M-估计:</p>
+    <div class="eq">$$\kappa_t=\arg\min_\kappa\ \sum_{k\le t}w_k\,\ell\big(\kappa^*_k,\kappa\big)$$</div>
+    <p>其中 \(w_k=g_k\cdot\mathbb 1\{\text{in-range}\}\)。EWMA 形式对应 \(\ell\) 为二次损失、\(w_k=c^{t-k}\)。已知结论:二次损失的崩溃点为 0(一个任意大的离群点就能毁掉估计);Huber 损失的崩溃点也为 0(但影响有界);<b>而"硬拒绝 + 有界权重"的组合,崩溃点可以达到某个正数</b>,取决于硬阈值的宽度。</p>
+    <p><b>关键问题。</b>如果连续 \(m\) 块都产生一致的偏差(不是随机离群,而是系统性偏移),硬拒绝会不会全部拒绝?如果会,那么记忆就"卡死"在旧值上;如果不会(因为偏差在阈值内),那么系统偏移会被慢慢吸收。<b>这两个失效模式之间的边界在哪里?</b></p>
+    <p><b>连接工作。</b>Huber (1964) 的 M-估计;RANSAC(Fischler & Bolles 1981)的内点判定;以及"在线鲁棒估计"里的 influence function 分析。</p>
+    <p><b>验证方式。</b>注入受控的系统性偏移(让后 20 块的颜色整体偏移 δ),扫描 δ 与持续长度,画出"被拒绝 / 被吸收 / 卡死"的三区相图。</p>
+    <div class="meta">难度:中高 · 需要理论 + 受控实验 · 能直接给出阈值的设计准则</div>
+  </div>
+
+  <div class="rq">
+    <span class="tag">RQ3 · batch 语义</span>
+    <h4>\(\rho_t\) 的 batch 平均,在推理时意味着什么?会不会抹掉个体差异?</h4>
+    <p>第 4.5 节指出:式 (5) 的 \(\rho_t\) 是对 batch 内 \(B\) 个样本求平均。训练时 batch 里有多条独立视频,推理时通常只有 1 条。这个 train/test 语义差异论文没有讨论。</p>
+    <p><b>数学形式化。</b>设 batch 内第 \(b\) 个样本的真实相似度为 \(\rho^{(b)}\),则观测到的是</p>
+    <div class="eq">$$\hat\rho=\frac{1}{B}\sum_b\rho^{(b)}=\bar\rho+\frac{1}{B}\sum_b\big(\rho^{(b)}-\bar\rho\big)$$</div>
+    <p>第二项是"个体差异"。当 \(B=1\),\(\hat\rho=\rho^{(1)}\)(无平均);当 \(B\) 大,个体差异被抹平,门控对所有样本给出同一个值。</p>
+    <p><b>为什么这是个真问题。</b>如果训练时所有样本共享门控,模型学到的是"这个 batch 整体可不可信",而不是"这一条可不可信"。那么推理单条时,门控的输入分布与训练时不同(少了平均带来的方差缩减)。<b>这可能造成门控在推理时比训练时"更抖"。</b></p>
+    <p><b>可检验预测。</b>推理时人为设置 batch=4(4 条不同主体的视频同时生成),门控应该更稳定;而 batch=1 时应该更抖。如果实测确实如此,说明训练/推理有语义鸿沟。</p>
+    <div class="meta">难度:低(容易验证) · 潜在影响大(如果成立,是一个实现级的 bug 级问题)</div>
+  </div>
+
+  <div class="rq">
+    <span class="tag">RQ4 · 架构分配</span>
+    <h4>记忆注意力"每 4 层插一次"是最优的吗?不同层承担的记忆功能是否不同?</h4>
+    <p>论文在 48 层里选了 12 层插记忆(每 4 层),这个数字没有消融支撑(第 5.5 节)。</p>
+    <p><b>数学形式化。</b>把"插入位置"记为集合 \(\mathcal S\subseteq\{1,\dots,48\}\),\(|\mathcal S|=12\)。要优化的是</p>
+    <div class="eq">$$\mathcal S^*=\arg\max_{\mathcal S}\ \text{LongCons}\big(\mathcal S\big)\quad\text{s.t.}\ |\mathcal S|=12$$</div>
+    <p>这是一个组合优化问题,但可以先做可解释性分析来缩小搜索空间:<b>用探针(probe)测每一层对"身份信息"与"运动信息"的编码强度</b>。如果身份信息集中在某几层,记忆插入应该偏向那几层。</p>
+    <p><b>连接工作。</b>这类"层间功能分工"的分析在 ViT/LLM 可解释性里很成熟(如 probing classifier、attention rollout)。在视频扩散模型里也有类似工作,但针对"长期记忆该插哪层"的分析据我所知是空白。</p>
+    <p><b>验证方式。</b>(a) 逐层探针:测每层隐状态对身份 ID / 姿态 / 场景的线性可解码性;(b) 按探针结果设计插入策略,与均匀插入对比;(c) 扫描层数 \(|\mathcal S|\in\{4,8,12,24,48\}\) 画性能-算力曲线。</p>
+    <div class="meta">难度:中 · 工程量大(每次都要重训) · 但结论有普适价值</div>
+  </div>
+
+  <div class="rq">
+    <span class="tag">RQ5 · 外推边界</span>
+    <h4>训练只到 10 块,部署要 200 块——中间这 20 倍的外推,靠什么支撑?</h4>
+    <p>第 6.4 节指出:混合视野最大到 10 块(约 50 秒,按每块 5 秒算),而论文展示 1000 秒(约 200 块)。这中间的差距完全由"记忆系统 + 窗口机制"承担。</p>
+    <p><b>数学形式化。</b>设训练分布为 \(p_{\text{train}}(h)\)(支持在 \(H\le10\)),部署为 \(p_{\text{deploy}}(h)\)(支持到 \(H\approx200\))。记忆机制的作用可以看成构造了一个映射</p>
+    <div class="eq">$$\phi:\ h_{1:t}\ \longmapsto\ \big(C_{t-1},M_{t-1}\big)$$</div>
+    <p>把"长历史"压缩成"定长条件"。如果 \(\phi\) 是充分的(即长历史中所有与生成相关的信息都被保留),那么外推就没问题;如果不是,那么必然存在一个"外推失效点"。</p>
+    <p><b>核心问题。</b>这个失效点在哪里?论文展示了 1000 秒成功,但没有展示 1000 秒以上的行为,也没有做"逐渐加长"的曲线(比如 100s / 300s / 600s / 1000s / 2000s 的一致性曲线)。<b>只有端点,没有趋势线。</b></p>
+    <p><b>可检验预测。</b>如果记忆是充分压缩,一致性应该随长度缓慢下降然后平台;如果不充分,应该出现加速下降(类似"遗忘曲线")。画这条曲线就能区分。</p>
+    <p><b>连接工作。</b>这与长上下文 LLM 的"长度外推"问题同构:训练长度 4k、推理到 128k,衰减曲线是评估外推能力的标准做法(Press et al. 2022 的 SCALING 曲线;Chen et al. 2023 的"lost in the middle")。</p>
+    <div class="meta">难度:低(只需把已有系统跑不同长度) · 信息量大 · 直接决定这个方法能不能用于"直播"场景</div>
+  </div>
+
+  <div class="chnav">
+    <a href="#ch10"><span class="lab">上一章</span><span class="ttl">← 批判性评估</span></a>
+    <a class="next" href="#ch12"><span class="lab">下一章</span><span class="ttl">结论 →</span></a>
+  </div>
+</section>
+
+<!-- ============ CH12 ============ -->
+<section id="ch12">
+  <div class="chhead"><div class="chnum">12</div><div>
+    <h2>结论:一句话与三个数字</h2>
+    <div class="sub">以及这篇论文真正教给我们的东西</div>
+  </div></div>
+
+  <div class="def"><span class="btag">一句话</span>
+    <p style="font-size:16.5px"><b>TaoMate 的核心贡献不是"更好的生成模型",而是给一个已经足够强的模型装了一套有明确数学性质的外部记忆系统:锚点提供绝对参考,几何衰减保证坏观测不会永久污染,门控让"不可信"平滑地转化为"更信锚点"。</b></p>
+  </div>
+
+  <h3>三个最能说明问题的数字</h3>
+  <div class="kv">
+    <div class="c"><div class="k">外观锚点稳态份额</div><div class="v">98.0%</div></div>
+    <div class="c"><div class="k">门控动态范围</div><div class="v">4.6×</div></div>
+    <div class="c"><div class="k">3 卡输出帧率</div><div class="v">35 FPS</div></div>
+  </div>
+  <p><b>98%</b>:外观分支几乎完全锁死在锚点上——这不是"调参",是果断地放弃了颜色的自适应能力,换来 Color Δ 减半。<b>4.6×</b>:当结构不一致时,门控把有效更新率从 0.144 压到 0.031,不是关闭而是减速。<b>35</b>:超过 24fps 播放门槛 45.8%,这是"实时"这个说法的唯一硬依据。</p>
+
+  <h3>这篇论文真正教给我们的</h3>
+  <ol>
+    <li><b>"记住"和"看见"是两件事。</b>KV cache 解决"看见最近的东西",持久记忆解决"记得最初的样子"。把两者混在一个机制里,必然二选一。</li>
+    <li><b>不对称是一种设计语言。</b>锚点不加噪、锚点永不更新、外观分支 98% 锁死——这篇论文反复用"某个东西必须绝对稳定"来换取其他东西的自由。</li>
+    <li><b>数学上的守恒(权重和为 1)带来工程上的可预测。</b>正因为式 (4) 是一个凸组合,它永远不会"跑飞";正因为份额公式是闭式的,超参的选择可以被推理而不是试错。</li>
+    <li><b>但"稳定"不等于"正确"。</b>所有的一致性指标都在惩罚"变化",而没有任何指标在检查"变化是否符合 prompt"。这是这类系统共同的风险(见 RQ1)。</li>
+  </ol>
+
+  <h3>如果你要复现或改进,从哪开始</h3>
+  <div class="tw"><table>
+    <tr><th>优先级</th><th>做什么</th><th>为什么</th></tr>
+    <tr><td><b>P0</b></td><td>先把式 (4) + 门控实现出来,在任意视频模型上试</td><td>这是方法的核心,而且与主干解耦,最容易验证</td></tr>
+    <tr><td><b>P1</b></td><td>画"长度-一致性"曲线(100s→2000s)</td><td>低成本、高信息量,直接检验外推边界(RQ5)</td></tr>
+    <tr><td><b>P2</b></td><td>补"大窗口"基线</td><td>验证记忆是否真的比"多留几块"更好(第 10.5 节)</td></tr>
+    <tr><td><b>P3</b></td><td>做"中途换场景"的基准,测自适应 λ</td><td>这是当前评测体系的盲区(RQ1)</td></tr>
+  </table></div>
+
+  <div class="chnav">
+    <a href="#ch11"><span class="lab">上一章</span><span class="ttl">← 自主科研问题</span></a>
+    <a class="next" href="#appA"><span class="lab">下一章</span><span class="ttl">附录:代码 →</span></a>
+  </div>
+</section>
+
+<!-- ============ APPENDIX ============ -->
+<section id="appA">
+  <div class="chhead"><div class="chnum">A</div><div>
+    <h2>附录 A · 三段代码</h2>
+    <div class="sub">把数学翻译成可运行的实现</div>
+  </div></div>
+
+  <p class="lead">以下代码为<b>示意性实现</b>:依据论文公式与文字描述构建,不是作者官方代码,但每一段都可以直接运行并输出与论文一致的趋势。</p>
+
+  <div class="codeblk">
+    <span class="clabel">A1 · 锚约束内存演化(论文式 4)[示意性实现]</span>
+    <pre><span class="cm"># 自检:
+#  - 变量: m, s, a 均为同形状张量; beta/lambda 为标量且 ∈[0,1]
+#  - 维度: 输出与输入同形状 (D,)
+#  - 公式: 与论文式 (4) 逐项一致; 三系数和为 1(见命题 3.1)
+#  - 稳态份额: lambda/(lambda+beta-lambda*beta) 与第 3 章表一致</span>
+<span class="kw">import</span> torch
+
+<span class="kw">def</span> <span class="fn">anchor_update</span>(m, s, a, beta, lam):
+    <span class="cm">"""锚约束的在线估计。
+    m: 上一步估计 (D,)
+    s: 当前观测   (D,)
+    a: 固定锚点   (D,)  —— 每一步都重新注入
+    beta: 观测吸收率  λ 见 lam
+    lam : 锚点先验权重
+    """</span>
+    <span class="kw">assert</span> <span class="nu">0.0</span> &lt;= beta &lt;= <span class="nu">1.0</span> <span class="kw">and</span> <span class="nu">0.0</span> &lt;= lam &lt;= <span class="nu">1.0</span>
+    <span class="kw">assert</span> m.shape == s.shape == a.shape
+    <span class="kw">return</span> (<span class="nu">1.0</span> - lam) * ((<span class="nu">1.0</span> - beta) * m + beta * s) + lam * a
+
+<span class="kw">def</span> <span class="fn">anchor_share</span>(beta, lam):
+    <span class="cm">"""稳态时锚点占的权重份额(第 3 章命题 3.3 的闭式解)。"""</span>
+    <span class="kw">return</span> lam / (lam + beta - lam * beta)
+
+<span class="cm"># ---- 验证:三系数和为 1,且稳态份额单调 ----</span>
+beta, lam = <span class="nu">0.15</span>, <span class="nu">0.20</span>
+c = (<span class="nu">1</span> - lam) * (<span class="nu">1</span> - beta)
+<span class="kw">print</span>(<span class="st">f"c={c:.3f}  锚点份额={</span><span class="fn">anchor_share</span>(beta, lam)<span class="st">:.3f}"</span>)   <span class="cm"># c=0.680 锚点份额=0.625</span>
+
+<span class="cm"># 模拟 200 步,观测恒为 0,锚点恒为 1 —— 看 m 收敛到 0.625</span>
+m = torch.zeros(<span class="nu">1</span>); a = torch.ones(<span class="nu">1</span>); s = torch.zeros(<span class="nu">1</span>)
+<span class="kw">for</span> _ <span class="kw">in</span> <span class="kw">range</span>(<span class="nu">200</span>):
+    m = <span class="fn">anchor_update</span>(m, s, a, beta, lam)
+<span class="kw">print</span>(<span class="st">f"200 步后 m={m.item():.4f} (理论 {</span><span class="fn">anchor_share</span>(beta, lam)<span class="st">:.4f})"</span>)</pre>
+  </div>
+
+  <div class="codeblk">
+    <span class="clabel sim">A2 · 置信门控(论文式 5)[示意性实现]</span>
+    <pre><span class="cm"># 自检:
+#  - 变量: s_v, a_v 形状 (B, T, D) —— B=batch, T=tokens, D=channels
+#  - 余弦: 沿 (T, D) 展平后计算, 对 batch 取平均 (论文式 5 明示)
+#  - 值域: g ∈ (g_min, 1)
+#  - 与式 (5) 一致: g = g_min + (1-g_min) * sigmoid((rho - tau) / T_g)</span>
+<span class="kw">import</span> torch
+<span class="kw">import</span> torch.nn.functional <span class="kw">as</span> F
+
+<span class="kw">def</span> <span class="fn">confidence_gate</span>(s_v, a_v, tau=<span class="nu">0.05</span>, T_g=<span class="nu">0.10</span>, g_min=<span class="nu">0.10</span>):
+    <span class="cm">"""s_v, a_v: (B, T, D) 空间归一化后的内容表示 与 锚点"""</span>
+    <span class="kw">assert</span> s_v.shape == a_v.shape <span class="kw">and</span> s_v.dim() == <span class="nu">3</span>
+    B = s_v.shape[<span class="nu">0</span>]
+    u = s_v.reshape(B, -<span class="nu">1</span>)              <span class="cm"># (B, T*D) —— 论文的 vec()</span>
+    v = a_v.reshape(B, -<span class="nu">1</span>)
+    cos = F.cosine_similarity(u, v, dim=<span class="nu">-1</span>)   <span class="cm"># (B,)</span>
+    rho = cos.mean()                        <span class="cm"># batch 平均(式 5)</span>
+    g = g_min + (<span class="nu">1.0</span> - g_min) * torch.sigmoid((rho - tau) / T_g)
+    <span class="kw">return</span> g, rho
+
+<span class="cm"># ---- 验证:中点与两端 ----</span>
+<span class="kw">for</span> rho_val <span class="kw">in</span> [<span class="nu">-0.15</span>, <span class="nu">0.05</span>, <span class="nu">0.35</span>]:
+    x = torch.tensor([[<span class="nu">1.0</span>], [<span class="nu">1.0</span>]])          <span class="cm"># 构造相似度 ~ 1 的情形需另行缩放</span>
+    <span class="cm"># 直接验证标量函数(与式 5 等价)</span>
+    g = <span class="nu">0.10</span> + <span class="nu">0.90</span> / (<span class="nu">1</span> + torch.exp(torch.tensor(-(rho_val - <span class="nu">0.05</span>) / <span class="nu">0.10</span>)))
+    beta_eff = <span class="nu">0.15</span> * g
+    share = <span class="nu">0.20</span> / (<span class="nu">0.20</span> + beta_eff - <span class="nu">0.20</span> * beta_eff)
+    <span class="kw">print</span>(<span class="st">f"rho={rho_val:+.2f}  g={g:.3f}  beta_eff={beta_eff:.4f}  锚点份额={share:.3f}"</span>)
+<span class="cm"># 期望: rho=-0.15 -> g≈0.207, share≈0.889 ; rho=+0.35 -> g≈0.957, share≈0.635</span></pre>
+  </div>
+
+  <div class="codeblk">
+    <span class="clabel sim">A3 · 反对角波前调度(论文 §3.5)[示意性实现]</span>
+    <pre><span class="cm"># 自检:
+#  - 变量: B=块数, K=去噪阶段数
+#  - 依赖: (b,k) 依赖 (b,k-1) 与 (b-1,k), 两者都在 δ-1 波
+#  - 波数: B+K-1;加速上限: B*K/(B+K-1)
+#  - 每波内的任务互不依赖,可并发;每 rank 只处理自己那一阶段</span>
+
+<span class="kw">def</span> <span class="fn">anti_diagonal_schedule</span>(B, K):
+    <span class="cm">"""返回: 每一波要执行的 (block, stage) 列表。"""</span>
+    waves = []
+    <span class="kw">for</span> delta <span class="kw">in</span> <span class="kw">range</span>(<span class="nu">0</span>, (B - <span class="nu">1</span>) + (K - <span class="nu">1</span>) + <span class="nu">1</span>):
+        wave = []
+        <span class="kw">for</span> b <span class="kw">in</span> <span class="kw">range</span>(B):
+            k = delta - b
+            <span class="kw">if</span> <span class="nu">0</span> &lt;= k &lt; K:
+                wave.append((b, k))
+        waves.append(wave)
+    <span class="kw">return</span> waves
+
+<span class="kw">def</span> <span class="fn">speedup_bound</span>(B, K):
+    <span class="kw">return</span> (B * K) / (B + K - <span class="nu">1</span>)
+
+waves = <span class="fn">anti_diagonal_schedule</span>(<span class="nu">5</span>, <span class="nu">3</span>)
+<span class="kw">for</span> i, w <span class="kw">in</span> <span class="kw">enumerate</span>(waves):
+    <span class="kw">print</span>(<span class="st">f"波 {i+1}: {w}"</span>)
+<span class="kw">print</span>(<span class="st">f"总波数 {len(waves)}  (应为 B+K-1 = {5+3-1})"</span>)
+<span class="kw">print</span>(<span class="st">f"加速上限 {</span><span class="fn">speedup_bound</span>(<span class="nu">5</span>,<span class="nu">3</span>)<span class="st">:.2f}x"</span>)
+
+<span class="cm"># 验证:同一波内不存在依赖关系</span>
+<span class="kw">for</span> w <span class="kw">in</span> waves:
+    s = <span class="kw">set</span>(w)
+    <span class="kw">for</span> (b, k) <span class="kw">in</span> w:
+        <span class="kw">assert</span> (b, k - <span class="nu">1</span>) <span class="kw">not in</span> s   <span class="cm"># 不依赖同波的上一步</span>
+        <span class="kw">assert</span> (b - <span class="nu">1</span>, k) <span class="kw">not in</span> s   <span class="cm"># 不依赖同波的前一块</span>
+<span class="kw">print</span>(<span class="st">"✓ 波内无依赖,可安全并发"</span>)</pre>
+  </div>
+
+  <h3 id="appB">附录 B · 公式总表</h3>
+  <div class="tw"><table>
+    <tr><th>#</th><th>公式</th><th>论文位置</th><th>本文用途</th></tr>
+    <tr><td>1</td><td>\(z_t\sim p_\theta(z_t\mid e_t,C_{t-1},M_{t-1})\)</td><td>式 (1)</td><td>因果分解的骨架</td></tr>
+    <tr><td>2</td><td>\(M_t=\mathcal U(M_{t-1},\mathrm{sg}(z_t))\)</td><td>式 (1)</td><td>记忆更新与 stop-gradient</td></tr>
+    <tr><td>3</td><td>\(M_t=(a^v,a^a,m^v_t,m^a_t,\kappa_t,\pi_t)\)</td><td>式 (2)</td><td>六分量因子化</td></tr>
+    <tr><td>4</td><td>\(s^v_t=P_v[\mathrm{Norm}_{HW}(\bar z^v_t)]\) 等</td><td>式 (3)</td><td>块表示分解</td></tr>
+    <tr><td>5</td><td>\(\mathcal E=(1-\lambda)[(1-\beta)m+\beta s]+\lambda a\)</td><td>式 (4)</td><td><b>第 3 章核心</b></td></tr>
+    <tr><td>6</td><td>\(c=(1-\lambda)(1-\beta)\)</td><td>式 (4) 推论</td><td>几何衰减率</td></tr>
+    <tr><td>7</td><td>锚点份额 \(=\lambda/(\lambda+\beta-\lambda\beta)\)</td><td>本文推导</td><td>第 3 章命题 3.3</td></tr>
+    <tr><td>8</td><td>\(k_{1/2}=-\ln2/\ln c\)</td><td>本文推导</td><td>半衰期</td></tr>
+    <tr><td>9</td><td>\(\rho_t=\frac1B\sum_b\cos(\cdot)\)</td><td>式 (5)</td><td>结构一致性</td></tr>
+    <tr><td>10</td><td>\(g_t=g_{\min}+(1-g_{\min})\sigma((\rho_t-\tau)/T_g)\)</td><td>式 (5)</td><td><b>第 4 章核心</b></td></tr>
+    <tr><td>11</td><td>\(m^v_t=\mathcal E(m^v_{t-1},a^v,s^v_t;\beta_vg_t,\lambda_v)\)</td><td>式 (5)</td><td>门控进入更新率</td></tr>
+    <tr><td>12</td><td>\(\tilde h^m_\ell=h^m_\ell+\mathrm{MemAttn}(...)\)</td><td>式 (6)</td><td>内容通路</td></tr>
+    <tr><td>13</td><td>\(\hat h^v_\ell=\tilde h^v_\ell+\gamma(c)\odot\mathrm{RMSNorm}(\tilde h^v_\ell)+b(c)\)</td><td>式 (6)</td><td>外观通路(FiLM)</td></tr>
+    <tr><td>14</td><td>\(S_{\max}=BK/(B+K-1)\)</td><td>本文推导</td><td>第 7 章加速上界</td></tr>
+  </table></div>
+
+  <h3 id="appC">附录 C · 符号表与引用说明</h3>
+  <div class="tw"><table>
+    <tr><th>符号</th><th>含义</th><th>章节</th></tr>
+    <tr><td>\(z_t=(z^v_t,z^a_t)\)</td><td>第 t 块的音视频潜变量</td><td>2</td></tr>
+    <tr><td>\(e_t\)</td><td>第 t 块的文本条件</td><td>2</td></tr>
+    <tr><td>\(C_{t-1}\)</td><td>有界活动上下文(带位置)</td><td>2</td></tr>
+    <tr><td>\(M_{t-1}\)</td><td>持久记忆(定长,无位置)</td><td>2</td></tr>
+    <tr><td>\(a^v,a^a\)</td><td>视觉锚点 / 音频参考(永不更新)</td><td>2,3</td></tr>
+    <tr><td>\(m^v_t,m^a_t\)</td><td>视频 / 音频内容记忆</td><td>2,3</td></tr>
+    <tr><td>\(\kappa_t,\pi_t\)</td><td>通道级 / 低频外观统计</td><td>2,4</td></tr>
+    <tr><td>\(\beta\)</td><td>观测吸收率</td><td>3</td></tr>
+    <tr><td>\(\lambda\)</td><td>锚点先验权重</td><td>3</td></tr>
+    <tr><td>\(c\)</td><td>衰减率 \((1-\lambda)(1-\beta)\)</td><td>3</td></tr>
+    <tr><td>\(\rho_t\)</td><td>与锚点的余弦相似度(batch 平均)</td><td>4</td></tr>
+    <tr><td>\(g_t\)</td><td>置信门</td><td>4</td></tr>
+    <tr><td>\(\tau,T_g,g_{\min}\)</td><td>门控阈值 / 温度 / 地板</td><td>4</td></tr>
+    <tr><td>\(P_{n-1},M_{n-1}\)</td><td>跨窗口的干净前缀 / 记忆</td><td>7</td></tr>
+    <tr><td>\(B,K\)</td><td>块数 / 去噪阶段数</td><td>7</td></tr>
+  </table></div>
+
+  <div class="note"><span class="btag">引用与核实说明</span>
+    <h4>关于本文提到的相关方法</h4>
+    <p>论文引用了大量 2026 年的最新工作。本文在写作时:</p>
+    <p>• <b>已外部核实</b>:LTX-Video(arXiv 2501.00103,标题确认)、Ovi(2510.01284)、MOVA(2602.08794)。<br>
+    • <b>未逐一核实</b>:Self-Forcing / Causal Forcing / Mutual Forcing / AvatarForcing / TetherCache / Pyramid Forcing / Sparse Forcing / OmniMem / FadeMem / Anchor Forcing / MaineCoon / HiAR / OmniForcing / LTX-2 等。</p>
+    <p>因此本文在提及这些方法时,一律标注"论文引用"并给出论文中的原始标题,<b>不对其内部机制做超出论文描述的断言</b>。如果读者要引用这些方法,请以原论文为准。</p>
+  </div>
+
+  <hr class="sep">
+  <p class="center small">精读完毕。如果想继续深入,建议按第 12 章的 P0→P3 顺序动手:先实现式 (4),再画长度-一致性曲线。</p>
+
+  <div class="chnav">
+    <a href="#ch12"><span class="lab">上一章</span><span class="ttl">← 结论</span></a>
+    <a class="next" href="#ch1"><span class="lab">回到开头</span><span class="ttl">↑ 第一章</span></a>
+  </div>
+</section>
+
+</div><!-- /wrap -->
+</main>
+
+<footer>
+  <div class="fwrap">
+    <b>TaoMate 精读 · 锚点引导的持久记忆</b><br>
+    论文:<i>TaoMate: Anchor-Guided Memory Bridging Evolving and Reference States for Real-Time Audio-Video Digital Human Generation</i>,arXiv 2607.24359v1(cs.CV)。<br><br>
+    全部公式对照 PDF 原文核对(式 1–6);所有量化推导(权重守恒、稳态份额、半衰期、门控动态范围、加速上界)均独立计算并与论文表述交叉验证。<br>
+    MathJax 采用本地副本,无 CDN 依赖。<br><br>
+    <span class="small">Last updated · 4 幅图来自论文坐标裁剪,6 幅 SVG 为博客自绘</span>
+  </div>
+</footer>
+
+<script>
+(function(){
+  const bar=document.getElementById('progress');
+  const links=[...document.querySelectorAll('#sidebar a')];
+  const secs=[...document.querySelectorAll('section')];
+  function onScroll(){
+    const h=document.documentElement;
+    const p=h.scrollTop/(h.scrollHeight-h.clientHeight)*100;
+    bar.style.width=p+'%';
+    let cur=null;
+    for(const s of secs){ if(s.getBoundingClientRect().top<=140) cur=s.id; }
+    links.forEach(a=>a.classList.toggle('active', a.getAttribute('href')==='#'+cur));
+    document.getElementById('backtop').classList.toggle('show', h.scrollTop>600);
+  }
+  document.addEventListener('scroll',onScroll,{passive:true});
+  onScroll();
+  const tg=document.getElementById('tocToggle'), sb=document.getElementById('sidebar');
+  tg.onclick=()=>sb.classList.toggle('open');
+  links.forEach(a=>a.addEventListener('click',()=>{ if(window.innerWidth<=1080) sb.classList.remove('open'); }));
+  document.addEventListener('click',e=>{
+    if(window.innerWidth<=1080 && sb.classList.contains('open') && !sb.contains(e.target) && e.target!==tg) sb.classList.remove('open');
+  });
+})();
+</script>
+</body>
+</html>
