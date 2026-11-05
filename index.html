@@ -14,7 +14,7 @@ MathJax = {
   options: { skipHtmlTags: ['script','noscript','style','textarea','pre','code'] }
 };
 </script>
-<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" async></script>
+<script src="assets/mathjax/tex-svg.js"></script>
 <style>
 :root{
   --lav-50:#faf7ff;--lav-100:#f3e8ff;--lav-200:#e9d5ff;--lav-300:#d8b4fe;--lav-500:#a855f7;--lav-600:#9333ea;--lav-700:#6d28d9;
@@ -246,6 +246,10 @@ footer .fwrap{max-width:860px;margin:0 auto}
   <ol start="15">
     <li><a data-n="14" href="#ch14">三层审计:读懂整篇论文</a></li>
     <li><a data-n="15" href="#ch15">20 道自测题</a></li>
+  </ol>
+  <div class="sgrp">相关论文</div>
+  <ol>
+    <li><a data-n="P" href="papers/representation-geometry/index.html">逐层线性可解码性的分解</a></li>
   </ol>
   <div class="sgrp">附录</div>
   <ol start="17">
@@ -1767,7 +1771,7 @@ ho\) 的符号决定了整个系统的可靠性方向。</div></details>
     <div class="step"><div class="sn">③</div><div class="sc">
       <p style="margin:0">要在 \(\|\delta\|_\infty\le\epsilon\) 下最大化内积 \(\nabla_xL^\top\delta\)。这里有一个关键观察:每个分量是独立的,而 \(\delta_i\in[-\epsilon,\epsilon]\)。所以让每个分量都取到边界、并且与梯度同号:</p>
       <div class="eq" style="margin:10px 0">$$\delta_i^\star=\epsilon\,\mathrm{sign}\big(\nabla_{x_i}L\big)\ \Longrightarrow\ \nabla_xL^\top\delta^\star=\epsilon\sum_i|\nabla_{x_i}L|=\epsilon\|\nabla_xL\|_1 .$$</div>
-      <div class="why">为什么是边界?因为内积对 \(\delta_i\) 是线性的,线性函数在区间上的最大值一定在端点。<b>这就是 $L_\infty$ 约束下最优扰动就是符号函数的原因。</b></div>
+      <div class="why">为什么是边界?因为内积对 \(\delta_i\) 是线性的,线性函数在区间上的最大值一定在端点。<b>这就是 \(L_\infty\) 约束下最优扰动就是符号函数的原因。</b></div>
     </div></div>
     <div class="step"><div class="sn">④</div><div class="sc">
       <p style="margin:0">于是 FGSM 的更新式:</p>
